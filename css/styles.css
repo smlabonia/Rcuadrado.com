@@ -415,6 +415,28 @@ p{ margin:0; }
 .stat-source a:hover{ color: var(--paper); }
 
 /* ==========================================================================
+   Las dos puertas de "Ya sabés lo que necesitás"
+   ========================================================================== */
+.doors{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+  margin-top: 44px;
+  position:relative; z-index:1;
+}
+@media (min-width:768px){
+  .doors{ grid-template-columns: repeat(2, 1fr); gap: 28px; }
+}
+/* Los dos caminos terminan en el mismo botón: cambia el punto de partida del
+   cliente, no el trabajo. Por eso el CTA es uno solo, centrado y debajo de
+   ambas tarjetas, en vez de uno por tarjeta. */
+.doors-cta{
+  display:flex; justify-content:center;
+  margin-top: 32px;
+  position:relative; z-index:1;
+}
+
+/* ==========================================================================
    Slider (tarjetas en formato slide)
    ========================================================================== */
 .slider{ position:relative; margin-top:44px; }
