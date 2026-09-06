@@ -90,6 +90,71 @@ el panorama se arma con todas las áreas juntas y todavía no está.
 | "¿Esto lo va a ver mi jefe?" | Qué se comparte y con qué roles, según lo acordado. Sin prometer confidencialidad que no se pueda sostener |
 | "No sé, eso lo maneja otro" | Se registra como indeterminado con el rol que sí sabría, y se sigue |
 
+## Que no se sienta un formulario
+
+Las herramientas son invisibles para el entrevistado: no hay botones, ni
+opciones para elegir, ni "por favor responda del 1 al 5". La persona escribe o
+habla como habla, y el registro ocurre por detrás.
+
+**Y son justamente lo que permite que la conversación sea suelta.** Como la
+cobertura se lleva afuera, el agente no necesita ir en orden para garantizar que
+no falta nada: puede seguir el hilo de quien contesta y después revisar qué
+quedó. Sin ese registro externo tendría que marchar por la lista para no
+perderse — que es exactamente el formulario con piel de chat que queremos
+evitar.
+
+### El guion es una lista de cobertura, no un orden
+
+Una sola respuesta suele tocar tres dimensiones. Se aprovecha eso: se pregunta
+por situaciones, no por temas, y después se marca lo que quedó cubierto.
+
+**Así no:**
+
+> — ¿Existe una política escrita sobre el uso de los sistemas?
+> — No, creo que no.
+> — Entendido, anotado. Siguiente: cuando entra alguien nuevo, ¿firma algo?
+
+**Así sí:**
+
+> — Contame cómo es cuando entra alguien nuevo. Desde que llega el primer día,
+>   ¿qué pasa con los equipos y los accesos?
+> — Y… viene, le decimos a quien maneja los sistemas que le arme la máquina, le
+>   crea el usuario del ERP y el mail. Si es de administración le damos acceso a
+>   la carpeta de facturación. Antes le hacíamos firmar algo, no sé si se sigue
+>   haciendo.
+> — Ese "algo" que firmaban, ¿te acordás qué decía?
+> — Era un compromiso de confidencialidad, creo. Lo tenía RRHH.
+> — ¿Y la última persona que entró este año, lo firmó?
+> — Uh, no sabría decirte.
+
+El segundo intercambio tocó GV.RR, GV.PO e ID.AM sin nombrar ninguna, y terminó
+en un "no sé" que se convierte en pedido de evidencia a RRHH — no en un
+indeterminado.
+
+### Seis cosas que lo vuelven tosco
+
+1. **Registrar después de cada respuesta.** Se anota cuando un tema cierra, no
+   turno por turno. Cada llamada es una pausa que se siente.
+2. **Vocabulario de máquina.** Nunca "voy a registrar esto", "cerré este punto",
+   ni el nombre de una dimensión. Eso no existe para el entrevistado.
+3. **Confirmar recepción.** "Entendido. Anotado." después de cada frase suena a
+   robot. Se acusa reflejando el contenido, no la recepción.
+4. **Preguntar lo que ya está en la ficha.** Si el inventario de sistemas ya
+   llegó, no se pregunta qué sistemas usan: se los nombra y se pregunta qué
+   falta. Preguntar lo sabido se lee como desatención.
+5. **Cortar una historia.** Si alguien empieza a contar el incidente que
+   tuvieron, se lo deja terminar. Ahí suele estar el mejor dato de toda la
+   entrevista, y cortarlo para volver al guion rompe el vínculo.
+6. **Una pregunta por turno, siempre igual.** Se puede encadenar, retomar algo
+   de hace diez minutos, o comentar brevemente antes de seguir. Lo que no se
+   puede es opinar sobre lo que contestaron.
+
+### El primer mensaje
+
+Es el que decide si esto se siente una charla o un trámite. Corto: quién es —una
+IA—, para qué, cuánto va a llevar, que puede contestar como hable y que si tiene
+que cortar, retoma con el mismo enlace.
+
 ## Escalamiento
 
 Si durante la entrevista aparece algo que no puede esperar al informe —un
