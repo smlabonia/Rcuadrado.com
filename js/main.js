@@ -5,17 +5,20 @@
   var nav = document.getElementById("nav");
 
   if (toggle && nav) {
-    toggle.addEventListener("click", function () {
-      var isOpen = nav.classList.toggle("is-open");
+    var setNavState = function (isOpen) {
       toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      toggle.setAttribute("aria-label", isOpen ? "Cerrar menú" : "Abrir menú");
       document.body.style.overflow = isOpen ? "hidden" : "";
+    };
+
+    toggle.addEventListener("click", function () {
+      setNavState(nav.classList.toggle("is-open"));
     });
 
     nav.querySelectorAll("a").forEach(function (link) {
       link.addEventListener("click", function () {
         nav.classList.remove("is-open");
-        toggle.setAttribute("aria-expanded", "false");
-        document.body.style.overflow = "";
+        setNavState(false);
       });
     });
   }
@@ -67,7 +70,13 @@
     function render(index) {
       current = index;
       dots.forEach(function (dot, i) {
-        dot.classList.toggle("is-active", i === index);
+        var active = i === index;
+        dot.classList.toggle("is-active", active);
+        if (active) {
+          dot.setAttribute("aria-current", "true");
+        } else {
+          dot.removeAttribute("aria-current");
+        }
       });
       if (prevBtn) prevBtn.disabled = index === 0;
       if (nextBtn) nextBtn.disabled = index === slides.length - 1;

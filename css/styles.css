@@ -3,7 +3,8 @@
    ========================================================================== */
 :root{
   /* Colores de marca */
-  --coral:  #FF4A1C; /* Coral señal — acción */
+  --coral:  #FF4A1C; /* Coral señal — acción (relleno) */
+  --coral-text: #CC3B16; /* Coral para texto sobre fondo claro — 4.71:1 (AA) */
   --amber:  #FFB020; /* Ámbar apoyo — nunca compite con el coral */
   --ink:    #17120F; /* Tinta cálida */
   --paper:  #FAF8F4; /* Papel */
@@ -17,7 +18,9 @@
   --ink-2:  #241D18;
   --ink-3:  #3A302A;
   --on-dark-muted: #B5ACA3;
-  --on-dark-faint: #5C5049;
+  --on-dark-faint: #5C5049;   /* solo bordes y elementos no textuales */
+  --on-dark-faint-2: #A0958B; /* texto terciario sobre ink-2 (AA) */
+  --on-dark-faint-3: #9A8F85; /* texto terciario sobre ink (AA) */
 
   /* Tipografía */
   --f-display: 'Big Shoulders Display', Impact, sans-serif;
@@ -29,7 +32,12 @@
 }
 
 *, *::before, *::after{ box-sizing: border-box; }
-html{ -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+html{
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  /* El header es sticky: sin esto el título de la sección queda debajo. */
+  scroll-padding-top: 80px;
+}
 body{
   margin:0;
   background: var(--paper);
@@ -58,6 +66,20 @@ p{ margin:0; }
   z-index:1000; font-family:var(--f-mono); text-transform:uppercase;
 }
 .skip-link:focus{ left:12px; top:12px; }
+
+/* Foco de teclado: el outline por defecto casi no se distingue sobre los
+   botones coral. El anillo va en el color de máximo contraste contra el fondo
+   de cada sección — tinta sobre claro, papel sobre oscuro — y vuelve a tinta
+   dentro de las tarjetas coral, que son claras aunque estén en sección oscura.
+   El orden de las reglas importa: la última gana a igual especificidad. */
+:focus-visible{
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+.section-dark :focus-visible,
+.site-footer :focus-visible{ outline-color: var(--paper); }
+.service-cta-card :focus-visible{ outline-color: var(--ink); }
 
 /* ==========================================================================
    Botones
@@ -141,14 +163,17 @@ p{ margin:0; }
   justify-content: center;
   text-align: center;
   transform: translateX(100%);
-  transition: transform .25s ease;
+  /* translateX solo lo mueve: sin visibility los links siguen siendo
+     tabulables fuera de pantalla. */
+  visibility: hidden;
+  transition: transform .25s ease, visibility .25s ease;
   font-family: var(--f-mono);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   font-size: 15px;
   z-index: 90;
 }
-.nav.is-open{ transform: translateX(0); }
+.nav.is-open{ transform: translateX(0); visibility: visible; }
 .nav a{ padding: 10px 0; }
 .nav-cta{ margin-top: 10px; }
 
@@ -241,7 +266,7 @@ p{ margin:0; }
   font-size: 12.5px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--coral);
+  color: var(--coral-text);
   margin: 0 0 14px;
 }
 .kicker-on-amber{ color: var(--ink); opacity:.7; }
@@ -326,7 +351,7 @@ p{ margin:0; }
   justify-content:center;
 }
 .service-cta-card h3{ color: var(--ink); }
-.service-cta-card p{ color: rgba(23,18,15,0.75); }
+.service-cta-card p{ color: var(--ink); }
 .service-cta-card .btn{ margin-top:20px; align-self:flex-start; }
 
 /* Línea de dato estadístico + fuente, al pie de una service-card */
@@ -342,9 +367,9 @@ p{ margin:0; }
 .stat-line .stat-num{ color: var(--amber); font-weight: 600; }
 .stat-source{
   display: block;
-  margin-top: 6px;
-  font-size: 11px;
-  color: var(--on-dark-faint);
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--on-dark-faint-2);
 }
 .stat-source a{ color: var(--on-dark-muted); text-decoration: underline; text-underline-offset: 2px; }
 .stat-source a:hover{ color: var(--paper); }
@@ -394,21 +419,30 @@ p{ margin:0; }
 .slider-btn:disabled{ opacity:.3; cursor:default; }
 .slider-btn:disabled:hover{ border-color:var(--on-dark-faint); color:var(--paper); }
 
-.slider-dots{ display:flex; align-items:center; gap:8px; }
+/* El punto visible mide 8px pero el botón que lo contiene mide 24px de alto
+   y suma 8px de padding a cada lado, para llegar al mínimo táctil de WCAG 2.2
+   (2.5.8) sin agrandar el punto. El padding hace de separación, por eso el
+   contenedor va sin gap. */
+.slider-dots{ display:flex; align-items:center; gap:0; }
 .slider-dot{
-  width:8px; height:8px; padding:0; border:none; border-radius:50%;
-  background: var(--on-dark-faint);
+  height:24px; padding:0 8px; border:none; background:transparent;
+  display:flex; align-items:center; justify-content:center;
   cursor:pointer;
+}
+.slider-dot::before{
+  content:""; display:block;
+  width:8px; height:8px; border-radius:50%;
+  background: var(--on-dark-faint);
   transition: width .2s ease, background-color .2s ease, border-radius .2s ease;
 }
-.slider-dot.is-active{ width:22px; border-radius:5px; background:var(--coral); }
+.slider-dot.is-active::before{ width:22px; border-radius:5px; background:var(--coral); }
 
 /* Variante clara: secciones sin section-dark */
 .section:not(.section-dark) .slider-btn{ border-color:var(--line); color:var(--ink); }
 .section:not(.section-dark) .slider-btn:hover{ border-color:var(--coral); color:var(--coral); }
 .section:not(.section-dark) .slider-btn:disabled:hover{ border-color:var(--line); color:var(--ink); }
-.section:not(.section-dark) .slider-dot{ background:var(--line); }
-.section:not(.section-dark) .slider-dot.is-active{ background:var(--coral); }
+.section:not(.section-dark) .slider-dot::before{ background:var(--line); }
+.section:not(.section-dark) .slider-dot.is-active::before{ background:var(--coral); }
 
 /* Fila que combina el carrusel con la tarjeta CTA fija (misma línea en desktop) */
 .hooks-row{
@@ -526,7 +560,7 @@ a.contact-item:hover{ border-color: var(--coral); background: var(--ink-2); }
 .footer-copy{
   font-family: var(--f-mono);
   font-size: 11.5px;
-  color: var(--on-dark-faint);
+  color: var(--on-dark-faint-3);
 }
 
 /* ==========================================================================
@@ -550,6 +584,7 @@ a.contact-item:hover{ border-color: var(--coral); background: var(--ink-2); }
   .nav-toggle{ display:none; }
   .nav{
     position:static; inset:auto; transform:none;
+    visibility: visible;
     flex-direction:row; background:transparent;
     font-size: 13px; gap: 34px;
   }
