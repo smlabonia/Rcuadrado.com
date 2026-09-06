@@ -12,6 +12,11 @@ documento.
 Versiones verificadas a septiembre de 2026. Las que se mueven rápido (ITIL,
 DCAM, DMBOK) están marcadas.
 
+> **Estado: borrador interno en desarrollo. No publicar.**
+> Este documento se sigue trabajando en varias sesiones. Nada de acá va al
+> sitio ni se publica como artifact hasta que se decida explícitamente. El
+> artifact existente es una foto vieja y no se actualiza salvo pedido expreso.
+
 ---
 
 ## Cuatro decisiones antes de elegir estándar
