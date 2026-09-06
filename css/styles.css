@@ -330,7 +330,10 @@ p{ margin:0; }
   font-size: 8.5vw;
   line-height: 1.02;
   letter-spacing: -0.01em;
-  max-width: 15ch;
+  /* 15ch alcanzaba cuando los títulos eran rótulos de dos palabras. Ahora
+     son frases, y a 15ch quedaban en 384px y cuatro líneas angostas contra
+     el margen izquierdo. */
+  max-width: 24ch;
   position: relative;
   z-index: 1;
 }
