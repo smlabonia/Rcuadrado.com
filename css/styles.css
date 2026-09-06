@@ -298,6 +298,7 @@ p{ margin:0; }
   font-size: 24px;
   line-height: 1.08;
   margin-top: 12px;
+  color: var(--paper);
 }
 .service-card h3:first-child{ margin-top: 0; }
 .service-card p{
