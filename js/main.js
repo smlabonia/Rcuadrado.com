@@ -28,8 +28,32 @@
     yearEl.textContent = new Date().getFullYear();
   }
 
+  // Baraja los hijos de un contenedor con Fisher-Yates. Se corre antes de
+  // construir los puntos y de leer cualquier medida, así el orden ya es el
+  // definitivo cuando arranca el resto. Al reinsertar todo de una con un
+  // fragment hay un solo reflow, no uno por tarjeta.
+  function shuffleChildren(container) {
+    var items = Array.prototype.slice.call(container.children);
+    if (items.length < 2) return;
+    for (var i = items.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = items[i];
+      items[i] = items[j];
+      items[j] = tmp;
+    }
+    var frag = document.createDocumentFragment();
+    items.forEach(function (el) { frag.appendChild(el); });
+    container.appendChild(frag);
+  }
+
   document.querySelectorAll(".slider").forEach(function (slider) {
     var track = slider.querySelector(".slider-track");
+
+    // Las tarjetas son diez y en mobile entran una o dos por pantalla: sin
+    // barajar, las últimas no las vería nunca nadie. Cada carga cambia el
+    // orden. El fallback sin JS es el orden del HTML, agrupado por vertical.
+    if (track) shuffleChildren(track);
+
     var slides = track ? Array.prototype.slice.call(track.children) : [];
     var prevBtn = slider.querySelector(".slider-prev");
     var nextBtn = slider.querySelector(".slider-next");
