@@ -1,4 +1,49 @@
 /* ==========================================================================
+   Tipografías self-hosteadas (subset latin)
+   Antes venían de fonts.googleapis.com + fonts.gstatic.com: dos orígenes
+   externos en cadena (CSS de 19,9 KB primero, recién después los woff2) en
+   el camino crítico del H1, que es el elemento más grande de la primera
+   pantalla. Ahora salen del mismo origen y el display va con preload.
+   Display y Sans son variables — un archivo cubre todo el rango de peso.
+   Mono no tiene versión variable en Google, van los tres pesos que se usan.
+   ========================================================================== */
+@font-face{
+  font-family: 'Big Shoulders Display';
+  font-style: normal;
+  font-weight: 700 900;
+  font-display: swap;
+  src: url('../assets/fonts/big-shoulders-display-700-900.woff2') format('woff2');
+}
+@font-face{
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('../assets/fonts/ibm-plex-sans-400-700.woff2') format('woff2');
+}
+@font-face{
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/fonts/ibm-plex-mono-400.woff2') format('woff2');
+}
+@font-face{
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('../assets/fonts/ibm-plex-mono-500.woff2') format('woff2');
+}
+@font-face{
+  font-family: 'IBM Plex Mono';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../assets/fonts/ibm-plex-mono-600.woff2') format('woff2');
+}
+
+/* ==========================================================================
    R² Tech Partner — Design tokens (Manual de Marca v1.0)
    ========================================================================== */
 :root{

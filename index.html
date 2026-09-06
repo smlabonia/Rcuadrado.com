@@ -27,9 +27,9 @@
 <meta name="twitter:image" content="https://rcuadrado.com/assets/og-image.png">
 
 <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- El H1 es el elemento más grande de la primera pantalla y va en el display:
+     lo precargamos para que empiece a bajar sin esperar al CSS. -->
+<link rel="preload" href="/assets/fonts/big-shoulders-display-700-900.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
