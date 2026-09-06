@@ -23,15 +23,16 @@ Extensión objetivo: 12 a 16 páginas. Más que eso no se lee; menos no se paga.
 
 | # | Sección | Qué muestra | De dónde sale | Páginas |
 |---|---|---|---|---|
+| 0 | *(insumo, no sección)* | La ficha de contexto se completa antes de entrevistar | Ver `alcance.md` | — |
 | 1 | **Portada y alcance** | Cliente, fecha, qué se evaluó y qué no, roles que participaron, versión del método | Metadatos de la corrida | 1 |
 | 2 | **Resumen ejecutivo** | Nivel general, las tres cosas que más urgen, qué pasa si no se hace nada | Agregado + las 3 de mayor prioridad | 1 |
 | 3 | **Cómo leer esto** | La escala 0-5, por qué la meta es 3, los estados de evidencia | Fijo, no cambia entre clientes | 0,5 |
 | 4 | **El panorama** | Radar de las seis funciones + barra de estados de evidencia | `nivel` y `estado_evidencia` de todas las dimensiones | 1 |
 | 5 | **La brecha priorizada** | Tabla: dimensión, nivel, meta, brecha, esfuerzo, prioridad | El esquema completo, ordenado | 1-2 |
 | 6 | **Hallazgos por función** | Seis bloques: Gobernar, Identificar, Proteger, Detectar, Responder, Recuperar | Un registro por dimensión | 5-6 |
-| 7 | **Riesgo en términos de la operación** | Qué se detiene, cuánto tarde en volver, qué cuesta | Derivado + criterio humano | 1 |
+| 7 | **Riesgo en términos de la operación** | Qué se detiene, cuánto tarda en volver, qué cuesta | Ficha de contexto + criterio humano | 1 |
 | 8 | **Cumplimiento** | Ley 25.326 e inscripción ante la AAIP, Res. 47/2018, Ley 26.388 | Bloque de preguntas de cumplimiento | 0,5 |
-| 9 | **Plan de trabajo** | Proyectos con qué resuelven, qué dimensiones mueven, esfuerzo, plazo, dependencias | `proyecto_asociado` agrupado + criterio humano | 2 |
+| 9 | **Plan de trabajo** | Proyectos con qué resuelven, qué dimensiones mueven, esfuerzo y plazo | **No sale de la entrevista.** Taller posterior sobre los hallazgos | 2 |
 | 10 | **Qué no se evaluó** | Fuera de alcance, e indeterminados con su motivo | `estado_evidencia = indeterminado` | 0,5 |
 | 11 | **Anexo de evidencia** | Qué se pidió, qué llegó, qué falta | `evidencia_solicitada` / `evidencia_recibida` | 1 |
 
@@ -52,18 +53,34 @@ construye. Declara lo que quedó fuera del alcance y lo que no se pudo
 determinar, con el motivo. Es la contracara honesta de vender un diagnóstico
 barato: el cliente sabe exactamente qué compró.
 
-## Decisiones abiertas
+## Decisiones tomadas
 
-Cada una cambia el esquema de salida o el prompt del agente, así que hay que
-cerrarlas antes de escribir D.
+1. **Número y meta, nunca el número solo.** Siempre "2 → meta 3". El número
+   aislado invita a discutir el número; al lado de la meta, la conversación se va
+   a la brecha. El número se guarda igual para el benchmark.
+2. **Roles, no personas.** En todo el informe. Es lo que hace que la gente hable
+   con sinceridad y lo que evita que el informe se use en una interna.
+3. **La cita textual no se entrega si compromete.** Regla operativa, para que no
+   quede a criterio del día: se parafrasea cuando *cualquiera* de las dos es
+   cierta — se puede deducir quién lo dijo, o el contenido perjudica a quien lo
+   dijo. En los demás casos se puede entregar textual. La cita siempre existe en
+   el registro interno: es el respaldo del puntaje si alguien lo discute.
+4. **El plan no sale de la entrevista.** Se trabaja después, sobre los
+   hallazgos, en un taller con el cliente. La entrevista mide; el plan se
+   construye. Consecuencia para el esquema: el agente **no** propone proyectos,
+   sólo deja el hallazgo con su brecha y su esfuerzo estimado.
+5. **Lenguaje directo sobre la práctica, nunca sobre la persona.** "No hay nadie
+   con responsabilidad asignada sobre los backups", no "el encargado de sistemas
+   no se ocupa". Sin adjetivos de catástrofe: los hechos asustan solos, y el
+   miedo inflado es otra forma de mentirle al cliente.
 
-1. **¿El informe muestra el número o sólo la banda?** El número invita a
-   discutir el número. La banda mantiene la conversación en la brecha.
-2. **¿Se nombran personas o sólo roles?** Afecta directamente cómo entrevista el
-   agente y cuán sinceras son las respuestas.
-3. **¿La cita textual se entrega o queda interna?** En una empresa chica, una
-   cita identifica al que habló en el acto.
-4. **¿El plan lleva números de esfuerzo, de plazo, de precio, o los tres?** Sin
-   ningún número no sirve para decidir; con precio cerrado deja de ser un plan y
-   pasa a ser una propuesta.
-5. **¿Cuán duro es el lenguaje de los hallazgos?**
+## El taller de plan, que es más que un trámite
+
+Que el plan se construya después y con el cliente no es una concesión, es una
+ventaja. Un plan que el cliente ayudó a armar es un plan que el cliente
+defiende internamente, y la reunión donde se arma es la conversación natural
+sobre quién ejecuta. Es el mejor puente a la ejecución que tiene el producto.
+
+Consecuencia de entrega: el informe se presenta en dos momentos —hallazgos
+primero, plan después— o se entrega completo tras el taller. Hay que elegir una
+y que sea siempre la misma.
