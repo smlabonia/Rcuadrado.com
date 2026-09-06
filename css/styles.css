@@ -518,9 +518,12 @@ p{ margin:0; }
 .slider-dot.is-active::before{ width:22px; border-radius:5px; background:var(--coral); }
 
 /* Variante clara: secciones sin section-dark */
-.section:not(.section-dark) .slider-btn{ border-color:var(--line); color:var(--ink); }
+/* --line da 1,37:1 sobre papel y el mínimo para un control es 3:1; --muted
+   llega a 5,44:1. Los puntos no son borde sino relleno, y ahí --line alcanza
+   porque el punto activo va en coral. */
+.section:not(.section-dark) .slider-btn{ border-color:var(--muted); color:var(--ink); }
 .section:not(.section-dark) .slider-btn:hover{ border-color:var(--coral); color:var(--coral); }
-.section:not(.section-dark) .slider-btn:disabled:hover{ border-color:var(--line); color:var(--ink); }
+.section:not(.section-dark) .slider-btn:disabled:hover{ border-color:var(--muted); color:var(--ink); }
 .section:not(.section-dark) .slider-dot::before{ background:var(--line); }
 .section:not(.section-dark) .slider-dot.is-active::before{ background:var(--coral); }
 
