@@ -14,23 +14,31 @@ Esto además convierte las diez reglas de validación de
 `esquema-de-salida.md` en algo estructural: no son instrucciones que el agente
 puede desobedecer, son esquemas de herramienta que rechazan la llamada.
 
-La más importante: **`cerrar_entrevista` falla si queda alguna dimensión en
+La más importante: **`cerrar_participacion` falla si queda alguna dimensión en
 `sin_tocar` o `abierto`.** El agente no puede terminar antes de tiempo aunque
 quiera; recibe el error y sigue. La regla 9 deja de depender de la buena
 voluntad del modelo.
 
 ## Las herramientas
 
-| Herramienta | Qué hace | Qué regla impone |
+Son **siete**, todas dentro de una participación — el agente nunca ve lo que
+contestó otra persona.
+
+| Herramienta | Argumentos | Qué regla impone |
 |---|---|---|
-| `consultar_pendientes()` | Devuelve las dimensiones sin cerrar | Da el avance honesto del hilo |
-| `registrar_observacion(...)` | Anota sin puntuar | Permite volver sin anclar el número temprano |
-| `pedir_evidencia(dimension_id, que)` | Registra el pedido | Pasaje de `declarado` a `respaldado` |
-| `cerrar_dimension(...)` | Puntúa y cierra | Exige cita textual si hay nivel (regla 4) |
-| `marcar_indeterminado(dimension_id, motivo, rol_que_sabria)` | Cierra sin nivel | Exige motivo (regla 3) |
-| `marcar_conflicto(dimension_id, detalle, roles[])` | Dos versiones distintas | Exige dos roles (regla 8) |
-| `escalar(motivo)` | Atención humana inmediata | La regla de escalamiento |
-| `cerrar_entrevista()` | Termina | **Falla si queda algo abierto** (regla 9) |
+| `consultar_pendientes` | — | Da el avance honesto del hilo |
+| `registrar_observacion` | `dimension_id`, `nota`, `cita_textual`, `rol_fuente` | Permite volver sin anclar el número temprano |
+| `pedir_evidencia` | `dimension_id`, `que`, `por_que` | Pasaje de `declarado` a `respaldado` |
+| `cerrar_dimension` | `dimension_id`, `nivel`, `hallazgo`, `cita_textual`, `cita_entregable`, `parafraseo`, `rol_fuente`, `esfuerzo` | Exige cita si hay nivel (regla 4) |
+| `marcar_indeterminado` | `dimension_id`, `motivo`, `rol_que_sabria` | Exige motivo (regla 3) |
+| `escalar` | `motivo`, `urgencia` | La regla de escalamiento |
+| `cerrar_participacion` | — | **Falla si queda algo abierto** (regla 9) |
+
+**El conflicto entre personas no es una herramienta de la entrevista.** Se
+detecta en la síntesis, comparando dimensiones cerradas entre participaciones.
+El motivo es de privacidad, no de diseño: si el agente que habla con el operario
+supiera lo que dijo el dueño, podría filtrárselo al repreguntar, y ahí se cae la
+promesa que le hicimos al entrevistado.
 
 Todas con `strict: true`, para que los argumentos validen contra el esquema y no
 haya que corregir a mano después.
@@ -161,7 +169,7 @@ antes de que nada salga.
 
 ## Pendiente
 
-- Escribir los esquemas JSON de las ocho herramientas.
+- Escribir los esquemas JSON de las siete herramientas.
 - Escribir el primer cliente simulado.
 - Decidir dónde corre esto: qué usa la persona para lanzar una entrevista y qué
   recibe el entrevistado — un link, un chat, un formulario conversacional.

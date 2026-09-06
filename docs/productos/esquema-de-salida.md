@@ -7,8 +7,9 @@ El agente emite datos, no prosa. El informe se genera después, desde acá. Es l
 que garantiza que treinta assessments produzcan la misma información final y
 que se puedan comparar entre sí.
 
-Tres tipos de registro: **corrida** (uno), **contexto** (uno, de la ficha) y
-**hallazgo** (uno por dimensión, el corazón).
+Tres tipos de registro: **assessment** (uno), **contexto** (uno, de la ficha),
+**participación** (una por persona) y **hallazgo** (uno por dimensión, el
+corazón).
 
 ## Quién llena qué
 
@@ -19,11 +20,11 @@ La columna *Origen* es la que marca los límites del agente:
 - **persona** — lo pone el consultor, después
 - **derivado** — se calcula, no se guarda a mano
 
-## Registro `corrida`
+## Registro `assessment`
 
 | Campo | Tipo | Origen |
 |---|---|---|
-| `corrida_id` | id | derivado |
+| `assessment_id` | id | derivado |
 | `cliente` | texto | ficha |
 | `vertical` | enum: `estrategia` `procesos` `datos` `ia` `ciberseguridad` `servicios` | ficha |
 | `sabor` | enum: `panorama` `verificacion` `planta` `seguimiento` | ficha |
@@ -31,9 +32,9 @@ La columna *Origen* es la que marca los límites del agente:
 | `estandar_base` | texto (ej. `NIST CSF 2.0`) | derivado |
 | `nivel_meta_default` | entero, por defecto `3` | ficha |
 | `fecha_inicio` / `fecha_cierre` | fecha | derivado |
-| `corrida_anterior_id` | id, opcional | ficha |
+| `assessment_anterior_id` | id, opcional | ficha |
 
-`corrida_anterior_id` es lo que habilita el sabor Seguimiento: sin él no hay
+`assessment_anterior_id` es lo que habilita el sabor Seguimiento: sin él no hay
 comparación contra línea de base.
 
 ## Registro `contexto`
@@ -61,6 +62,26 @@ Cada elemento de `sistemas[]`: `nombre`, `proceso_que_sostiene`, `proveedor`,
 **`completitud_ficha` no es administrativo.** Si el cliente no pudo armar el
 inventario de sistemas, eso puntúa la dimensión de gestión de activos y va al
 informe como hallazgo.
+
+## Registro `participacion` — uno por persona
+
+Lo que le toca a **una** persona dentro del assessment: el subconjunto de
+dimensiones que puede contestar con hechos, según el ruteo del guion.
+
+| Campo | Tipo | Origen |
+|---|---|---|
+| `participacion_id` | id | derivado |
+| `assessment_id` | id | derivado |
+| `rol` | texto, nunca nombre | persona |
+| `dimensiones[]` | lista de `dimension_id` | derivado del ruteo del guion |
+| `estado` | enum: `pendiente` `en_curso` `cerrada` `abandonada` | derivado |
+| `sesiones` | entero | derivado |
+
+`abandonada` es la salida de emergencia: si alguien nunca completa lo suyo, el
+consultor la marca y sus dimensiones abiertas pasan a `indeterminado` con motivo
+"el participante no completó". Sin eso, una persona de vacaciones bloquea el
+entregable entero — y con eso, la falta queda visible en la sección 10 del
+informe, que es donde corresponde.
 
 ## Registro `hallazgo` — uno por dimensión
 
@@ -116,7 +137,8 @@ repetibilidad la sostiene la validación, no la disciplina.
 6. `respaldado` ⟹ `evidencia_recibida` no vacía.
 7. `verificado` ⟹ lo marcó una persona, nunca el agente.
 8. `conflicto = true` ⟹ al menos dos `rol_fuente` y `detalle_conflicto` no vacío.
-9. Una corrida no cierra con ninguna dimensión en `sin_tocar` o `abierto`.
+9. Una participación no cierra con ninguna de **sus** dimensiones en
+   `sin_tocar` o `abierto`. El assessment cierra cuando cierran todas.
 10. `rol_fuente` no contiene nombres propios.
 
 La 4 y la 7 son las que sostienen la promesa: ningún puntaje sin respaldo, y
@@ -153,5 +175,5 @@ práctica y no sobre la persona.
 ## Pendiente
 
 - Los `dimension_id` reales salen del guion, que todavía no está escrito.
-- Decidir el formato de almacenamiento: un archivo por corrida alcanza para los
+- Decidir el formato de almacenamiento: un archivo por assessment alcanza para los
   primeros clientes; el benchmark va a pedir algo consultable.

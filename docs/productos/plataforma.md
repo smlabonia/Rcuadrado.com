@@ -70,11 +70,30 @@ tiene que ser cierto en el sistema y no sólo en el discurso.
 
 ## Identidad de los participantes
 
-Enlace firmado de un solo uso, con vencimiento, enviado por correo o WhatsApp.
-**Usuario y contraseña es una pared**: un jefe de planta en Añelo contestando
-desde el celular no crea una cuenta, abandona. El enlace tiene que reanudar la
-sesión donde quedó, porque las entrevistas están cortadas en bloques de 15 a 20
-minutos a propósito.
+Enlace personal, firmado, **reanudable**, con vencimiento. Enviado por correo o
+WhatsApp. **Usuario y contraseña es una pared**: un jefe de planta en Añelo
+contestando desde el celular no crea una cuenta, abandona.
+
+Reanudable es lo importante, porque las entrevistas están cortadas en bloques de
+15 a 20 minutos a propósito y nadie termina de una sentada:
+
+- El mismo enlace se abre las veces que haga falta hasta que la participación
+  cierra. Cada apertura es una **sesión**; la participación las agrupa.
+- Al volver, el agente reencuadra en una línea: qué se vio, qué falta, cuánto
+  queda. No arranca de cero ni finge que no pasó el tiempo.
+- Vence por tiempo —tres semanas es razonable— o al cerrar la participación, lo
+  que pase primero. Se puede reemitir; el anterior muere.
+- Como el token viaja en la URL, la sesión se retoma desde otro dispositivo sin
+  fricción. La contracara es que quien tenga el enlace puede contestar: hay que
+  asumirlo, poder revocarlo, y no mandarlo a listas.
+
+**Si alguien nunca termina**, la participación se marca `abandonada` y sus
+dimensiones abiertas pasan a `indeterminado` con motivo. El assessment puede
+cerrar igual y la falta queda escrita en la sección 10 del informe. Sin esa
+salida, una persona de vacaciones bloquea el entregable entero.
+
+**Recordatorios** a los 3 y a los 7 días. El coordinador del cliente ve "2 de 4
+completas" — nunca el contenido.
 
 ## Seis cosas operativas que van a doler si no se piensan
 
