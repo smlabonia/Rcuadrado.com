@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Página no encontrada | R² Tech Partner</title>
+<meta name="description" content="La página que buscás no existe o cambió de dirección.">
+<meta name="robots" content="noindex, follow">
+<meta name="theme-color" content="#17120F">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/styles.css">
+<style>
+  /* La 404 es una sola pantalla: header, contenido y footer reparten el alto
+     del viewport sin depender de la altura exacta del header. */
+  body{ min-height:100vh; display:flex; flex-direction:column; }
+  .error-main{ flex:1 1 auto; display:flex; flex-direction:column; }
+  .error-section{ flex:1 1 auto; display:flex; align-items:center; }
+  .error-code{
+    font-family: var(--f-mono);
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--coral);
+    margin: 0 0 16px;
+  }
+  .error-actions{ display:flex; flex-wrap:wrap; gap:14px; margin-top:32px; position:relative; z-index:1; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a href="/" class="logo" aria-label="R² Tech Partner — inicio">
+      <span class="logo-mark">R<sup>2</sup></span>
+      <span class="logo-word">Tech Partner</span>
+    </a>
+  </div>
+</header>
+
+<main class="error-main">
+  <section class="section section-dark error-section">
+    <div class="grid-bg" aria-hidden="true"></div>
+    <div class="wrap">
+      <p class="error-code">Error 404</p>
+      <h1 class="section-title">Esta página no existe.</h1>
+      <p class="section-lead">Puede que el link esté mal escrito o que la página haya cambiado de dirección. Desde el inicio llegás a todo lo demás.</p>
+      <div class="error-actions">
+        <a href="/" class="btn btn-coral">Volver al inicio</a>
+        <a href="/#contacto" class="btn btn-ghost">Contacto</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="proportion-bar" aria-hidden="true">
+    <span style="width:60%;background:var(--paper-2)"></span>
+    <span style="width:25%;background:var(--ink)"></span>
+    <span style="width:10%;background:var(--coral)"></span>
+    <span style="width:5%;background:var(--amber)"></span>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <a href="/" class="logo logo-footer" aria-label="R² Tech Partner — inicio">
+      <span class="logo-mark">R<sup>2</sup></span>
+      <span class="logo-word">Tech Partner</span>
+    </a>
+    <nav class="footer-nav" aria-label="Pie de página">
+      <a href="/#servicios">Servicios</a>
+      <a href="/#nosotros">Nosotros</a>
+      <a href="/#contacto">Contacto</a>
+    </nav>
+    <p class="footer-copy">© <span id="year"></span> R² Tech Partner · Neuquén, Argentina</p>
+  </div>
+</footer>
+
+<script src="/js/main.js"></script>
+</body>
+</html>
