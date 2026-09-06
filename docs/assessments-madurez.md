@@ -190,6 +190,113 @@ Acá el error clásico es medir la organización cuando lo que hay que medir es
 **cada proceso**. Un cliente puede tener compras en nivel 4 y mantenimiento en
 nivel 1, y el promedio no le dice nada.
 
+Pero antes de medir un proceso hay que encontrarlo. Esta vertical no es un
+assessment sino cuatro etapas encadenadas: cada una más profunda y sobre menos
+cosas que la anterior.
+
+### El embudo
+
+| Etapa | Profundidad | Sobre qué | Duración estimada |
+|---|---|---|---|
+| **1. Barrido** | Área | Todas las áreas | 2-3 h con 4-5 referentes |
+| **2. Mapeo** | Proceso, un solo nivel | Todas las áreas + 3-4 cadenas | Medio día a un día cada 4-5 áreas |
+| **3. Selección** | — | Compuerta con criterios | 1 reunión |
+| **4. PEMM** | Proceso, con evidencia | Los 5-8 procesos elegidos | ~2 h por proceso |
+
+La profundidad es despareja a propósito. **Mapear procesos y subprocesos de
+todas las áreas es donde se mueren estos trabajos**: tres semanas quemadas, un
+mapa hermoso y un cliente que todavía no vio nada funcionando. El detalle de
+subprocesos y actividades es trabajo de implementación, no de diagnóstico: se
+releva cuando ya se sabe que ese proceso se va a tocar, porque ahí se paga solo.
+
+El corte comercial natural cae después de la etapa 3: lo de arriba es corto y
+acotado, lo de abajo ya es el proyecto.
+
+### Etapa 1 · Barrido de cobertura
+
+Encuentra los agujeros blancos: áreas sin herramienta, con el trabajo en papel,
+sin registro y sostenidas por una sola persona. Es el instrumento que el sitio
+ya promete en dos tarjetas — "¿cada área de tu empresa tiene una herramienta que
+la soporte?" y "¿cuánto del trabajo diario se coordina por mensajes y
+planillas?".
+
+Seis preguntas por área:
+
+1. **¿Qué herramienta sostiene el trabajo del área?** Ninguna / planillas / un
+   sistema general / un sistema propio del área.
+2. **¿Qué sale en papel?** Formularios, partes, remitos, planillas de campo.
+3. **¿Dónde queda el registro?** No queda / papel / planilla local / planilla
+   compartida / sistema.
+4. **¿Quién consume lo que el área produce, y cómo se lo pasan?** Mail,
+   WhatsApp, papel, integración.
+5. **¿Cuántas personas saben hacerlo?** Una / algunas / está documentado.
+6. **¿Cuántas horas por semana se van recargando datos de un lado a otro?**
+
+Dos advertencias sobre este instrumento:
+
+- **La pregunta 4 pesa más que la 1.** El caso más frecuente no es el área sin
+  sistema: es el área que tiene sistema, lo usa de repositorio y coordina el
+  trabajo real por WhatsApp y una planilla paralela. Preguntar qué está
+  licenciado no lo detecta; preguntar dónde se coordina, sí.
+- **La pregunta 5 se reporta aparte, con su propio número.** Al dueño de una
+  PyME no lo mueve un 1,8 sobre 5; lo mueve "si Marta se va, compras se para
+  tres semanas". Es además lo que separa el nivel 1 del 2 en la escala común.
+
+El barrido tiene resolución para distinguir un 0-2 de un 3 o más, no para fijar
+el nivel exacto. Eso lo confirma la etapa 4.
+
+Sale de acá con hallazgos que pertenecen a tres verticales y conviene
+etiquetarlos al salir: "no hay herramienta" va a 02, "el dato no queda o nadie
+confía en él" va a 03, "el sistema existe pero nadie lo administra" va a 01. Una
+sola entrevista alimenta tres assessments: es el mejor argumento para hacerlo
+primero.
+
+### Etapa 2 · Mapeo
+
+Inventario de procesos a **un solo nivel de profundidad**, en todas las áreas.
+APQC PCF da la jerarquía ya hecha —categoría, grupo de procesos, proceso,
+actividad— con versión de petróleo y gas: se usan los dos primeros niveles para
+todas las áreas y se baja al tercero sólo en los candidatos. Evita discutir con
+el cliente qué es un proceso y qué un subproceso, conversación que no lleva a
+ningún lado.
+
+**Más una pasada por cadenas punta a punta: tres o cuatro, no más.** Si el
+barrido es por área y el mapeo también, todo lo que cruza áreas queda invisible
+—y ahí está el dolor real, porque nadie es dueño de eso—. Es el facilitador
+"Responsable" de PEMM, detectado antes de llegar a PEMM. En una empresa
+industrial de la región las cadenas suelen ser:
+
+- Aviso de falla → orden de trabajo → repuesto → ejecución → cierre
+- Requerimiento → compra → recepción → pago
+- Pedido → programación → entrega → facturación
+- Búsqueda → contratación → alta → habilitaciones
+
+Se sigue cada cadena preguntando en cada pase: qué recibís, de quién, en qué
+formato, y qué hacés antes de poder usarlo. Donde A dice que manda algo que B
+dice que no recibe, hay un proceso roto que ningún relevamiento por área iba a
+encontrar.
+
+### Etapa 3 · Selección
+
+Compuerta explícita, con los criterios escritos y acordados **antes** de mirar
+los resultados. Si no, la elección parece arbitraria y el cliente elige por
+política interna.
+
+| Criterio | Qué mira | De dónde sale |
+|---|---|---|
+| **Dolor** | Horas, errores, retrabajo, reclamos | Barrido, preguntas 2 y 6 |
+| **Riesgo** | Cuánta gente sabe hacerlo, cumplimiento, seguridad, continuidad | Barrido, pregunta 5 |
+| **Valor** | Volumen y criticidad para el negocio | Mapeo y cadenas |
+| **Factibilidad** | ¿Se puede tocar sin rehacer todo lo demás? | Mapeo |
+
+Dolor y riesgo salen del barrido casi gratis. Poder decir "estos cinco, por
+esto" es la mitad de la venta del proyecto de ejecución.
+
+### Etapa 4 · Medición del proceso
+
+Recién acá entra el modelo de madurez propiamente dicho, sobre los 5-8 procesos
+seleccionados y con evidencia. Los candidatos evaluados para esta etapa:
+
 ### Candidatos
 
 **Hammer PEMM (Harvard Business Review, abril 2007).** El mejor candidato para
@@ -207,9 +314,9 @@ que ya tienen una oficina de procesos.
 
 **APQC Process Classification Framework.** No es un modelo de madurez: es la
 taxonomía de procesos, con versión general y versiones sectoriales —incluida
-**petróleo y gas**—. Su valor acá es distinto y grande: define de qué procesos
-estamos hablando, para que el relevamiento no se invente su propio mapa cada
-vez. Registro gratuito.
+**petróleo y gas**—. Su valor acá es distinto y grande: es el instrumento de la
+etapa 2, el que define de qué procesos estamos hablando para que el
+relevamiento no se invente su propio mapa cada vez. Registro gratuito.
 
 **acatech Industrie 4.0 Maturity Index.** Seis etapas encadenadas
 —informatización, conectividad, visibilidad, transparencia, capacidad
@@ -228,12 +335,12 @@ preguntarlo primero.
 
 ### Recomendación
 
-**Núcleo:** Hammer PEMM, aplicado proceso por proceso sobre los 5-8 procesos
-críticos. **Complemento:** APQC PCF como mapa para elegir esos procesos,
+**Núcleo:** Hammer PEMM en la etapa 4, proceso por proceso, sobre los 5-8
+seleccionados. **Complemento:** APQC PCF como instrumento de la etapa 2,
 acatech cuando el proceso vive en planta. **Descartar:** OMG BPMM por peso,
 SIRI por licencia.
 
-### Dimensiones propuestas
+### Dimensiones propuestas — etapa 4
 
 Por cada proceso relevado:
 
@@ -540,7 +647,7 @@ estándar está escrito en el idioma de un gerente de planta de Neuquén.
 | Vertical | Núcleo | Complemento | Horizonte |
 |---|---|---|---|
 | 01 Estrategia tecnológica | COBIT 2019 recortado | ISO/IEC 38500; CAF del proveedor; FinOps | — |
-| 02 Digitalización de procesos | Hammer PEMM | APQC PCF; acatech I4.0 en planta | ISO 9001 si ya está |
+| 02 Digitalización de procesos | Hammer PEMM, en la etapa 4 de un embudo de cuatro | APQC PCF en el mapeo; acatech I4.0 en planta | ISO 9001 si ya está |
 | 03 Analítica de datos | DAMA-DMBOK + escala propia | DCAM si es regulado | ISO/IEC 38505 |
 | 04 Adopción de IA | Preparación propia + NIST AI RMF | Perfil GenAI de NIST | ISO/IEC 42001 |
 | 05 Ciberseguridad | NIST CSF 2.0 | CISA ZTMM; C2M2 e IEC 62443 con OT; CIS como referencia interna | ISO/IEC 27001 |
