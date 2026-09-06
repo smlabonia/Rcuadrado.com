@@ -1,0 +1,14 @@
+{
+  "name": "rcuadrado.com",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sitio de R² Tech Partner — HTML, CSS y JS estáticos sobre GitHub Pages.",
+  "license": "UNLICENSED",
+  "scripts": {
+    "validate": "html-validate index.html 404.html",
+    "serve": "python3 -m http.server 8000"
+  },
+  "devDependencies": {
+    "html-validate": "^9.7.1"
+  }
+}

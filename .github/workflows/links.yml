@@ -1,0 +1,27 @@
+name: Links
+
+# El sitio cita 11 notas de medios argentinos. Ese tipo de link se cae solo
+# con el tiempo, pero es un problema lento: no tiene sentido bloquear un
+# push por eso, sí revisarlo una vez por semana.
+on:
+  schedule:
+    - cron: '0 11 * * 1'   # lunes 08:00 en Argentina (UTC-3)
+  workflow_dispatch:
+
+jobs:
+  lychee:
+    name: Detectar links rotos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: lycheeverse/lychee-action@v2
+        with:
+          # 403 y 429 son sitios de noticias bloqueando bots, y 999 es
+          # LinkedIn: aceptarlos evita falsos positivos semanales.
+          args: >-
+            --no-progress
+            --base .
+            --max-retries 3
+            --accept 200,206,301,302,403,429,999
+            index.html 404.html
+          fail: true
