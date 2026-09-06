@@ -5,9 +5,9 @@ instrumento para medirla. Este documento es el paso previo a construirlo: qué
 estándares existen para cada vertical, para qué sirve cada uno, cuál conviene
 como base y cuál no se puede usar por licencia.
 
-**No es el assessment.** Es la lista de materiales y la recomendación de con
-cuáles construirlo. Cada assessment se desarrolla aparte, en su propio
-documento.
+**No es el assessment.** Es la lista de materiales, la recomendación de con
+cuáles construirlo y el método con el que se ejecutan los seis. Cada assessment
+se desarrolla aparte, en su propio documento.
 
 Versiones verificadas a septiembre de 2026. Las que se mueven rápido (ITIL,
 DCAM, DMBOK) están marcadas.
@@ -605,6 +605,169 @@ vocabulario en el informe, porque es lo que el cliente escuchó nombrar.
 
 ---
 
+## Método de ejecución — la entrevista agéntica
+
+Los seis assessments se ejecutan igual: **el relevamiento lo conduce un agente
+de IA y el criterio lo pone la persona.** No es una decisión de costo, es una
+decisión de honestidad: no queremos facturar horas que no le compran nada al
+cliente.
+
+### Lo que se ahorra y lo que no
+
+Lo que el agente elimina son las horas que nunca valió la pena cobrar:
+coordinar agendas, transcribir, tabular, perseguir a quien no contestó,
+reformatear el informe. Eso el cliente lo pagaba y no compraba nada.
+
+Lo que no se ahorra es el criterio: la repregunta incisiva sobre lo que no
+cierra, el pedido y la verificación de evidencia, la observación en sitio, la
+priorización, los plazos y la firma del plan.
+
+**Consecuencia comercial:** con este método no se puede cobrar por hora. Cobrar
+por hora obliga a mentir sobre las horas o a destruir el margen. Se cobra el
+resultado — el diagnóstico y el plan— y se dice explícito.
+
+### El reparto
+
+| El agente | La persona |
+|---|---|
+| Cobertura completa del guion, sin saltarse dimensiones | Repregunta crítica sobre lo que no cierra |
+| Misma profundidad para el cliente 1 y el 30 | Pedido y verificación de evidencia |
+| Retoma lo que quedó abierto hasta cerrarlo | Observación en sitio: el papel apilado, el grupo de WhatsApp |
+| Traduce el vocabulario al idioma del entrevistado | Priorización y plazos |
+| Cita textual como respaldo de cada puntaje | Validación y firma del plan |
+| Salida estructurada, lista para tabular | Cierre con el cliente |
+
+El agente es el punto de entrada; la persona es el cierre. Ninguna de las dos
+mitades funciona sola.
+
+### Dicho, respaldado, verificado
+
+Una entrevista —agéntica o humana— recoge **declaraciones**. Que alguien diga
+"sí, hacemos backups" no es un backup, y en ciberseguridad la autoevaluación se
+sobreestima de forma sistemática. Entregar madurez declarada como si fuera
+verificada es mentir en otra variable.
+
+| Estado | Qué significa | Cómo se obtiene |
+|---|---|---|
+| **Declarado** | Alguien lo dijo | Entrevista agéntica |
+| **Respaldado** | Hay un documento o una captura | Pedido de evidencia posterior |
+| **Verificado** | Lo miró la persona | Revisión técnica acotada |
+| **Indeterminado** | No se pudo establecer, con motivo escrito | Cualquiera de los tres |
+
+El informe muestra los cuatro estados. **La proporción de "declarado sin
+respaldo" es en sí misma un hallazgo** y se reporta como tal: una organización
+que no puede mostrar evidencia de lo que afirma tiene un problema de gestión,
+no sólo de madurez. Ningún competidor le dice eso al cliente.
+
+### La máquina de estados
+
+Que el agente "profundice y retome hasta tener panorama completo" no lo produce
+el prompt: lo produce el estado explícito por dimensión. Sin él, el agente cree
+que terminó cuando se acaba la conversación.
+
+Cada dimensión del assessment vive en uno de estos estados: **sin tocar →
+declarado sin respaldo → respaldado → verificado**, más **en conflicto** (dos
+personas dicen cosas distintas) y **no aplica** con motivo. El agente ve ese
+tablero en cada turno y sabe qué le falta.
+
+**El cierre es por cobertura, no por tiempo.** La entrevista no termina a los 45
+minutos: termina cuando toda dimensión está resuelta o marcada como
+indeterminable con motivo. Si no llega, lo dice en vez de rellenar.
+
+### La salida es un esquema, no un informe
+
+El agente emite datos estructurados; la prosa del informe se genera después,
+desde esos datos. Es lo que garantiza que treinta assessments produzcan la misma
+información final y alimenten el benchmark propio.
+
+Un registro por dimensión, con estos campos:
+
+| Campo | Contenido |
+|---|---|
+| `vertical` / `dimension` | A qué assessment y a qué dimensión corresponde |
+| `nivel` | 0 a 5 en la escala común |
+| `estado_evidencia` | Declarado / respaldado / verificado / indeterminado |
+| `cita_textual` | La frase exacta que respalda el puntaje |
+| `rol_fuente` | Quién lo dijo, por rol y no por nombre |
+| `evidencia_solicitada` / `evidencia_recibida` | Qué se pidió y qué llegó |
+| `brecha` | Distancia contra el nivel objetivo |
+| `esfuerzo` / `prioridad` | Para ordenar el plan |
+| `proyecto_asociado` | El puente a la ejecución |
+
+**Cita obligatoria:** si no hay frase textual que lo respalde, no hay puntaje.
+Es el antídoto contra el hallazgo inventado y, de paso, la trazabilidad que
+ningún informe escrito a mano tiene.
+
+### Control de calidad
+
+Tres mecanismos, ninguno opcional:
+
+1. **Set de evaluación.** Cinco a diez clientes simulados con respuestas fijas.
+   Si el agente los puntúa distinto en marzo que en septiembre, se perdió la
+   repetibilidad, que es todo el punto. Este set es el equivalente agéntico de
+   la lista de verificación del manual.
+2. **Revisor antes del informe.** Se audita el esquema contra las citas antes de
+   que se convierta en prosa.
+3. **Firma humana del plan.** El agente propone un borrador priorizado; la
+   persona lo valida, ajusta plazos y firma. Un plan que no leyó nadie rompe la
+   promesa por el otro lado.
+
+### Modos de falla conocidos
+
+- **Deseabilidad social.** La gente contesta lo que cree que se espera. Se
+  mitiga preguntando por hechos, no por opiniones: no "¿tienen backups?" sino
+  "¿cuándo fue la última vez que restauraron uno y quién estaba?".
+- **Abandono.** Nadie termina una entrevista de 60 minutos por chat. Bloques de
+  15-20 minutos por área, reanudables.
+- **Vaguedad.** "Más o menos", "depende", "eso lo maneja Juan". Requiere reglas
+  explícitas de repregunta y poder dejar el tema abierto.
+- **Deriva entre corridas.** Lo detecta el set de evaluación, nada más.
+- **Síntesis alucinada.** Lo previene la cita obligatoria.
+
+### Confidencialidad — a decidir y escribir
+
+El agente va a procesar la descripción detallada de las debilidades de una
+empresa de la región. El cliente lo va a preguntar y tener la respuesta clara es
+ventaja de venta, no letra chica. Hay que definir y poner por escrito:
+
+- Dónde se procesa y bajo qué términos de retención
+- Qué se guarda, cuánto tiempo y quién accede
+- Qué pasa con los datos personales que aparezcan — aplican la Ley 25.326 y la
+  Res. AAIP 47/2018 de la sección siguiente
+- Si el cliente puede pedir el borrado completo al cerrar el proyecto
+
+### Costo, precio y capacidad
+
+**Costo variable:** con `claude-opus-5` (USD 5 por millón de tokens de entrada,
+25 de salida), una entrevista de área ronda USD 2-4 y un assessment completo de
+cinco a ocho áreas más la síntesis queda en el orden de **USD 20-40**. Con
+caché del guion base baja más. Son órdenes de magnitud a validar midiendo.
+
+**Precio: USD 2.000.** El piso de mercado local para un trabajo de este tipo
+está alrededor de 3.000. La diferencia se explica por el método —el relevamiento
+lo hace un agente y no tres consultores facturando agendas— y ése es
+exactamente el argumento a usar: es verificable, es de terceros y refuerza el
+diferencial.
+
+**No usar precio propio tachado.** Decir "esto vale 10.000 y te lo dejo en
+2.000" es la misma familia de movida que inflar horas: una referencia ficticia
+para que la real parezca un favor. Además establece que el precio es
+negociable, justo antes de cotizar la ejecución, que es donde está el margen.
+Si se quiere referencia de mercado, que sea de terceros y verificable.
+
+**Crédito contra la ejecución.** Si el cliente contrata alguno de los proyectos
+del plan dentro de los 90 días, los USD 2.000 se descuentan del primero. Vuelve
+el riesgo del cliente casi nulo, demuestra con hechos que el valor está en la
+ejecución, y le pone reloj a la decisión sin apurar a nadie.
+
+**Capacidad, que es el cuello de botella real.** El costo no limita nada; las
+horas sí. Cierre, verificación de evidencia, validación del plan y revisión del
+informe son entre 8 y 12 horas por assessment: a USD 2.000 da un efectivo de
+165 a 250 la hora, y un techo de cuatro o cinco assessments por mes si además
+hay que ejecutar proyectos. La preventa se dimensiona con ese número.
+
+---
+
 ## Normativa argentina que conviene tener mapeada
 
 No son marcos de madurez, son obligaciones. Aparecen en el assessment de
@@ -678,3 +841,13 @@ licencia se necesita para leerlo, no para preguntar lo que enseña.
   aparezcan en un entregable.
 - Definir los valores de referencia: contra qué se compara un nivel 2 para
   decir si está bien o mal. Sin eso el número no significa nada.
+- Escribir el esquema de salida completo, campo por campo. Es la pieza de la que
+  dependen el informe, el benchmark y la comparación entre clientes.
+- Armar el set de evaluación con clientes simulados. Sin él no hay forma de
+  saber si el agente sigue puntuando igual dentro de seis meses.
+- Cerrar la política de confidencialidad y llevarla al brochure: dónde se
+  procesa, qué se retiene, quién accede, y si el cliente puede pedir el borrado.
+- Confirmar el precio de 2.000 contra el piso local de 3.000 con dos o tres
+  presupuestos reales de la zona, para poder citar la referencia sin inventarla.
+- Medir el costo real de una corrida completa con `count_tokens` en vez de
+  estimarlo.
