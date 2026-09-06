@@ -417,6 +417,21 @@ p{ margin:0; }
 .stat-source a{ color: var(--on-dark-muted); text-decoration: underline; text-underline-offset: 2px; }
 .stat-source a:hover{ color: var(--paper); }
 
+/* Lectura propia: ocupa el mismo lugar que .stat-line al pie de la tarjeta
+   —mismo borde, misma posición— pero va en sans y sin cita, porque no es un
+   dato prestado sino el punto de vista de la casa.
+   Especificidad de dos clases a propósito: `.service-card p` (0,1,1) fija
+   color, tamaño y flex-grow, y sin esto le ganaría al selector de una clase. */
+.service-card .card-note{
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--on-dark-faint);
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: var(--on-dark-muted);
+  flex-grow: 0;
+}
+
 /* ==========================================================================
    Las dos puertas de "Ya sabés lo que necesitás"
    ========================================================================== */
