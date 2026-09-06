@@ -1,0 +1,16 @@
+{
+  "name": "R² Tech Partner",
+  "short_name": "R²",
+  "description": "Consultoría tecnológica en Neuquén: estrategia, digitalización, datos, IA y ciberseguridad.",
+  "lang": "es-AR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "browser",
+  "background_color": "#17120F",
+  "theme_color": "#17120F",
+  "icons": [
+    { "src": "/assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/assets/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/assets/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
