@@ -526,8 +526,29 @@ p{ margin:0; }
   background: var(--amber);
   padding: 56px 0;
 }
-.section-amber-band .section-title{ max-width: 18ch; }
+/* El titular a 18ch partía en cinco líneas angostas y dejaba más de la mitad
+   de la franja vacía. Ahora respira, y la columna derecha ocupa ese aire con
+   lo que el menú "Nosotros" prometía y la sección no daba: quién está detrás. */
+.section-amber-band .section-title{ max-width: 26ch; }
 .section-amber-band .section-lead{ color: rgba(23,18,15,0.72); }
+
+.band-aside{ margin-top: 40px; }
+.creds{ margin: 18px 0 0; }
+.cred{ padding: 15px 0; border-top: 1px solid rgba(23,18,15,0.25); }
+.cred:last-child{ border-bottom: 1px solid rgba(23,18,15,0.25); }
+.cred dt{
+  font-family: var(--f-display);
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 23px;
+  line-height: 1.05;
+}
+.cred dd{
+  margin: 5px 0 0;
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: rgba(23,18,15,0.78);
+}
 
 /* ==========================================================================
    Contacto
@@ -630,7 +651,13 @@ a.contact-item:hover{ border-color: var(--coral); background: var(--ink-2); }
 
   .services-grid{ grid-template-columns: repeat(3, 1fr); gap: 28px; }
 
-  .band-inner{ display:flex; }
+  .band-inner{
+    display:grid;
+    grid-template-columns: 1fr 34%;
+    gap: 56px;
+    align-items:start;
+  }
+  .band-aside{ margin-top: 6px; }
   .section-amber-band .section-title{ font-size: 50px; }
 
   .contact-grid{ margin-top: 48px; }
