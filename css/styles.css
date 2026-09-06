@@ -87,6 +87,9 @@ p{ margin:0; }
 .btn-ghost{ background: transparent; color: var(--ink); border-color: var(--ink); }
 .btn-ghost:hover{ background: var(--ink); color: var(--paper); }
 
+.btn-dark{ background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.btn-dark:hover{ background:#000; border-color:#000; }
+
 .section-dark .btn-ghost{ color:var(--paper); border-color:var(--paper); }
 .section-dark .btn-ghost:hover{ background:var(--paper); color:var(--ink); }
 
@@ -295,6 +298,7 @@ p{ margin:0; }
   font-size: 24px;
   line-height: 1.08;
   margin-top: 12px;
+  color: var(--paper);
 }
 .service-card h3:first-child{ margin-top: 0; }
 .service-card p{
@@ -416,10 +420,38 @@ p{ margin:0; }
 .hooks-row .slider{ margin-top:0; min-width:0; }
 .hooks-cta{ margin-top:0; }
 
+/* La tarjeta CTA no lleva título: centramos su contenido y destacamos el botón */
+.hooks-cta{
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+}
+.hooks-cta p{ flex-grow:0; }
+.hooks-cta .btn{
+  align-self:center;
+  margin-top:22px;
+  box-shadow: 0 0 0 5px rgba(250,248,244,0.35);
+}
+.hooks-cta .btn:hover{ box-shadow: 0 0 0 7px rgba(250,248,244,0.5); }
+
 @media (min-width:1024px){
-  .hooks-row{ flex-direction:row; align-items:stretch; }
-  .hooks-row .slider{ flex:1 1 0; }
-  .hooks-cta{ flex:0 0 31.3%; }
+  .hooks-row{
+    display:grid;
+    grid-template-columns: 1fr 31.3%;
+    grid-template-areas:
+      "track cta"
+      "controls controls";
+    column-gap:20px;
+    row-gap:26px;
+    align-items:stretch;
+  }
+  /* El wrapper .slider no genera caja propia: sus hijos entran directo
+     en el grid para que la tarjeta CTA iguale la altura de las tarjetas
+     (fila "track"), sin sumar el alto de los controles del carrusel. */
+  .hooks-row .slider{ display:contents; }
+  .hooks-row .slider-track{ grid-area: track; }
+  .hooks-row .slider-controls{ grid-area: controls; margin-top:0; }
+  .hooks-cta{ grid-area: cta; flex:none; }
 }
 
 /* ==========================================================================
