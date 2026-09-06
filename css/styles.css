@@ -469,23 +469,22 @@ p{ margin:0; }
 .hooks-cta .btn:hover{ box-shadow: 0 0 0 7px rgba(250,248,244,0.5); }
 
 @media (min-width:1024px){
+  /* En desktop el carrusel escondía 3 de las 5 tarjetas detrás de un gesto
+     que casi nadie hace. A partir de acá las tarjetas dejan de deslizarse y
+     entran las cinco más la CTA en una grilla de 3x2 — la misma que usa
+     "Cinco verticales de trabajo", así las dos secciones quedan consistentes.
+     Ni .slider ni .slider-track generan caja propia (display:contents), así
+     que las tarjetas son hijas directas de la grilla. */
   .hooks-row{
     display:grid;
-    grid-template-columns: 1fr 31.3%;
-    grid-template-areas:
-      "track cta"
-      "controls controls";
-    column-gap:20px;
-    row-gap:26px;
+    grid-template-columns: repeat(3, 1fr);
+    gap:28px;
     align-items:stretch;
   }
-  /* El wrapper .slider no genera caja propia: sus hijos entran directo
-     en el grid para que la tarjeta CTA iguale la altura de las tarjetas
-     (fila "track"), sin sumar el alto de los controles del carrusel. */
-  .hooks-row .slider{ display:contents; }
-  .hooks-row .slider-track{ grid-area: track; }
-  .hooks-row .slider-controls{ grid-area: controls; margin-top:0; }
-  .hooks-cta{ grid-area: cta; flex:none; }
+  .hooks-row .slider,
+  .hooks-row .slider-track{ display:contents; }
+  .hooks-row .slider-controls{ display:none; }
+  .hooks-cta{ flex:none; }
 }
 
 /* ==========================================================================
