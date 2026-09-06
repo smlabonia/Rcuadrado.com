@@ -691,8 +691,11 @@ Un registro por dimensión, con estos campos:
 | `rol_fuente` | Quién lo dijo, por rol y no por nombre |
 | `evidencia_solicitada` / `evidencia_recibida` | Qué se pidió y qué llegó |
 | `brecha` | Distancia contra el nivel objetivo |
-| `esfuerzo` / `prioridad` | Para ordenar el plan |
-| `proyecto_asociado` | El puente a la ejecución |
+| `esfuerzo` | Banda estimada, para ordenar después |
+
+El agente **no** propone proyectos ni prioridades: eso se construye en un taller
+posterior sobre los hallazgos, con el cliente. El esquema completo, con tipos y
+reglas de validación, está en `productos/esquema-de-salida.md`.
 
 **Cita obligatoria:** si no hay frase textual que lo respalde, no hay puntaje.
 Es el antídoto contra el hallazgo inventado y, de paso, la trazabilidad que
