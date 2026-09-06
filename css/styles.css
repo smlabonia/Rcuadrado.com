@@ -51,6 +51,7 @@
   --coral:  #FF4A1C; /* Coral señal — acción (relleno) */
   --coral-text: #CC3B16; /* Coral para texto sobre fondo claro — 4.71:1 (AA) */
   --amber:  #FFB020; /* Ámbar apoyo — nunca compite con el coral */
+  --amber-ink: #7A5000; /* Ámbar para texto sobre fondo claro (AA) */
   --ink:    #17120F; /* Tinta cálida */
   --paper:  #FAF8F4; /* Papel */
   --paper-2:#F2EDE5; /* Arena */
@@ -396,6 +397,28 @@ p{ margin:0; }
 .service-cta-card h3{ color: var(--ink); }
 .service-cta-card p{ color: var(--ink); }
 .service-cta-card .btn{ margin-top:20px; align-self:flex-start; }
+
+/* La tarjeta estaba fijada en oscuro sin importar dónde cayera. Sobre una
+   sección clara eso son bloques casi negros recortando contra el papel a
+   15,66:1: diez seguidos leen como parche y llevaban la tinta al 45% de la
+   página, cuando el manual de marca pide 25%. En sección clara la tarjeta
+   pasa a arena con borde — sigue siendo un objeto, sin gritar.
+   La tarjeta CTA queda afuera: es coral en cualquier fondo. */
+.section:not(.section-dark) .service-card:not(.service-cta-card){
+  background: var(--paper-2);
+  border-color: var(--line);
+}
+.section:not(.section-dark) .service-card:not(.service-cta-card) h3{ color: var(--ink); }
+.section:not(.section-dark) .service-card:not(.service-cta-card) p{ color: var(--muted-2); }
+.section:not(.section-dark) .service-card:not(.service-cta-card) .card-note,
+.section:not(.section-dark) .service-card:not(.service-cta-card) .stat-line{
+  color: var(--muted-2);
+  border-top-color: var(--line);
+}
+.section:not(.section-dark) .stat-line .stat-num{ color: var(--amber-ink); }
+.section:not(.section-dark) .stat-source{ color: var(--muted); }
+.section:not(.section-dark) .stat-source a{ color: var(--muted-2); }
+.section:not(.section-dark) .stat-source a:hover{ color: var(--ink); }
 
 /* Línea de dato estadístico + fuente, al pie de una service-card */
 .stat-line{
