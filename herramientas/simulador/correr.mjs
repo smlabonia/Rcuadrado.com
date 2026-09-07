@@ -52,12 +52,17 @@ const client = new OpenAI({
 
 // Único punto de entrada a la API. Si el proxy rechaza el pensamiento adaptativo,
 // lo apaga para el resto de la corrida y reintenta esa misma llamada sin él.
+const NO_SOPORTA_THINKING = /thinking.*(not supported|unsupported|unexpected|unrecognized|extra fields)/i;
+
 async function pedir(params) {
   try {
     return await client.chat.completions.create(params);
   } catch (e) {
-    if (params.thinking && e?.status === 400) {
-      console.error("⚠ El proxy rechazó thinking. Sigo sin pensamiento adaptativo.");
+    // Sólo apagamos el pensamiento adaptativo si el proxy dice que no lo
+    // soporta. Cualquier otro 400 se propaga: apagarlo a ciegas escondía la
+    // causa real y reintentaba contra el mismo error.
+    if (params.thinking && e?.status === 400 && NO_SOPORTA_THINKING.test(e?.message ?? "")) {
+      console.error("⚠ El proxy no soporta thinking. Sigo sin pensamiento adaptativo.");
       THINKING = null;
       const { thinking, ...resto } = params;
       return await client.chat.completions.create(resto);
@@ -65,6 +70,16 @@ async function pedir(params) {
     throw e;
   }
 }
+
+// El mensaje del asistente vuelve del proxy con el razonamiento traducido de
+// Anthropic a formato OpenAI. Si lo reenviamos en el historial, la traducción de
+// vuelta altera los bloques y Anthropic rechaza el pedido: exige que vuelvan
+// idénticos. Guardamos sólo lo que hace falta para continuar la conversación.
+const paraElHistorial = (m) => ({
+  role: m.role,
+  content: m.content ?? null,
+  ...(m.tool_calls?.length ? { tool_calls: m.tool_calls } : {}),
+});
 
 const uso = { entrevistador: vacio(), entrevistado: vacio() };
 function vacio() { return { entrada: 0, salida: 0, escritura_cache: 0, lectura_cache: 0 }; }
@@ -163,8 +178,13 @@ Contale por dónde van en su idioma, no en el del marco, y que sea verdad.
 La conversación no termina por tiempo, termina por cobertura.
 
 SI APARECE ALGO URGENTE
-Un incidente en curso, un acceso activo de alguien que ya no trabaja ahí, algo
-ilegal: escalalo y decilo sin alarmar.
+Escalalo y decilo sin alarmar. Lo que se escala son hechos, no categorías:
+un acceso que sigue abierto para alguien que ya no trabaja ahí o para un
+proveedor cuyo trabajo terminó; una alerta que se viene repitiendo sin cerrarse
+mientras el equipo sigue en uso; una contraseña compartida por gente de afuera;
+un equipo del que se sospecha que está comprometido; algo ilegal.
+Si dudás de si algo llega o no llega, escalalo igual: el costo de escalar de más
+es una revisión que no hacía falta.
 
 EL CIERRE
 Agradecé el tiempo. No devuelvas resultados, no resumas hallazgos, no adelantes
@@ -231,7 +251,7 @@ for (let i = 0; i < MAX_INTERCAMBIOS && !estado.cerrada; i++) {
     const m = r.choices[0].message;
     const t = (m.content ?? "").trim();
     if (t) dicho.push(t);
-    msgsEntrevistador.push(m);
+    msgsEntrevistador.push(paraElHistorial(m));
 
     const llamadas = m.tool_calls ?? [];
     if (!llamadas.length) break;

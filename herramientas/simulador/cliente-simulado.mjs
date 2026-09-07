@@ -105,6 +105,32 @@ El incidente:
   los mails", se compró el antivirus. No cambió nada más. No quedó nada escrito.
 - No hay lista de mejoras pendientes.
 
+Cómo se enteran de las cosas:
+- Del phishing se enteraron porque llamó un cliente. No los avisó ningún sistema.
+- Nadie mira nada de los sistemas. El antivirus avisa en la pantalla de cada uno
+  y ahí termina. El proveedor no manda ningún informe de nada.
+- Cuando a alguien le salta el antivirus, le avisa a Ariel o lo cierra y sigue.
+  No hay ninguna regla de qué es grave y qué no.
+
+Qué se hizo durante el phishing:
+- No hay ningún procedimiento escrito de qué hacer. Llamaron al proveedor y él
+  fue diciendo por teléfono qué tocar.
+- Para cortarle la casilla a la chica hubo que esperar a que el proveedor entrara
+  remoto. Ariel solo no podía.
+- Nunca se estableció hasta dónde llegó: no saben si el que entró llegó a ver
+  otra cosa además de la casilla, ni cuántos correos salieron. Si te preguntan
+  eso, decís que no, que nunca lo supieron y que tampoco se les ocurrió preguntarlo.
+- A Don Rubén le contaron cuando volvió, al segundo día.
+- A los clientes NO se les avisó nada, aunque desde la casilla salieron correos a
+  toda la agenda. Si te preguntan si avisaron, decís que no, que se resolvió y
+  listo. Y agregás que ahora que lo pensás capaz habría que haber avisado.
+- Al seguro no se le avisó. A ningún organismo tampoco. Ni se lo plantearon.
+
+Cómo se volvió a la normalidad:
+- Se volvió a mandar correo cuando el proveedor dijo que ya estaba limpio. Nadie
+  sabe cuánto tendría que haber llevado ni si dos días era mucho o poco.
+- No se avisó formalmente que estaba resuelto: se fue sabiendo, de boca.
+
 Restauración de respaldos:
 - El proveedor dice que hace backup del servidor. Nunca probaron restaurar nada.
 - No hay nada escrito de qué se levanta primero si se cae todo.
@@ -177,5 +203,13 @@ export const ESPERADO = {
   "PR.DS": 2, // permisos por carpeta y copias, puestos en su momento y nunca revisados
   "PR.PS": 1, // actualiza el proveedor cuando entra por otra cosa
   "PR.IR": 1, // hay copias y nunca se probó restaurar
+  "DE.CM": 1, // el antivirus avisa en cada máquina y ahí termina
+  "DE.AE": 1, // se mira caso por caso, según quién esté
+  "RS.MA": 1, // se llama al proveedor, sin pasos definidos
+  "RS.AN": 1, // se entendió lo básico por lo que se vio; nunca se estableció el alcance
+  "RS.CO": 1, // se le avisó a la dirección; a clientes y seguro, a nadie
+  "RS.MI": 1, // se cortó a mano cuando el proveedor pudo entrar
+  "RC.RP": 1, // se depende del proveedor; nadie sabe el orden ni el tiempo
+  "RC.CO": 0, // nadie avisó que estaba resuelto: se fue sabiendo solo
   _escalamiento_esperado: "VPN activa de un proveedor que dejó de trabajar hace dos años",
 };

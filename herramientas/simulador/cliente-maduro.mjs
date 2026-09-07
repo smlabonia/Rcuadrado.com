@@ -158,6 +158,32 @@ Actualizaciones y equipos:
   viejo. Están identificados en el inventario. No hay ninguna medida especial
   alrededor de ellos: están en la red como cualquier otro.
 
+Monitoreo y alertas:
+- El antivirus manda las alertas a una consola que mira el jefe de sistemas. No
+  hay una frecuencia definida para revisarla ni queda registro de qué se miró.
+  Vos no ves nada de eso, lo sabés porque él te lo contó.
+- No hay ningún criterio escrito de qué alerta es grave. La costumbre es que
+  quien la ve le avisa al jefe de sistemas.
+
+Respuesta a incidentes:
+- NO hay un procedimiento escrito de respuesta a incidentes informáticos. El de
+  no conformidades de calidad existe y funciona bien, pero no cubre esto.
+- En los últimos dos años no hubo un incidente informático serio, así que nunca
+  se puso a prueba nada de esto. Lo decís con claridad si preguntan.
+- El jefe de sistemas puede aislar un equipo de la red por su cuenta: está en su
+  descripción de puesto. Qué se aísla y en qué orden no está definido en ningún
+  lado.
+- HAY UNA OBLIGACIÓN: algunos contratos con clientes petroleros exigen notificar
+  un incidente de seguridad dentro de las 48 horas. Lo sabés porque está en tu
+  matriz de requisitos. Nunca se aplicó, y no hay definido quién lo haría ni cómo.
+  Esto lo contás si preguntan a quién habría que avisar afuera.
+
+Cómo se cerraría un incidente:
+- Nunca hubo uno que cerrar, así que no sabés cómo se comunicaría la vuelta a la
+  normalidad ni quién lo haría. Si te preguntan, decís exactamente eso: que no
+  ha pasado y que no sabrías decir. NO lo inventes ni lo compares con el circuito
+  de calidad.
+
 Las alertas del antivirus:
 - Hace unas dos semanas que una PC del laboratorio tira alertas del antivirus.
   Gustavo dijo que lo estaba viendo y no volvió a informar. La PC sigue en uso.
@@ -205,6 +231,14 @@ export const ESPERADO = {
   "PR.DS": 2, // definido qué es sensible, permisos puestos, sin verificación ni protección al salir
   "PR.PS": 2, // actualizaciones regulares; los equipos viejos identificados pero no compensados
   "PR.IR": 2, // copias, una restauración probada suelta, sin plan escrito
+  "DE.CM": 2, // hay una consola que mira el jefe de sistemas; adentro no se sabe con qué frecuencia
+  "DE.AE": 2, // costumbre de a quién avisar, sin criterio escrito de qué es grave
+  "RS.MA": 1, // no hay procedimiento escrito y nunca se puso a prueba
+  "RS.AN": 1, // no hubo incidente serio que analizar
+  "RS.CO": 2, // se sabe a quién avisar adentro; la obligación contractual existe pero nadie la ejecuta
+  "RS.MI": 2, // hay autoridad para aislar, pero no está definido qué ni en qué orden
+  "RC.RP": 2, // se sabe qué levantar primero, sin plan escrito ni tiempo comprometido
+  "RC.CO": null, // nunca hubo un incidente que cerrar: no se puede establecer
   _escalamiento_esperado: "alertas de antivirus sin resolver hace dos semanas en una PC en uso",
   _derivacion_esperada: "todo el detalle técnico va al jefe de sistemas",
 };

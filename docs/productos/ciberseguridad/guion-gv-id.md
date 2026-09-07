@@ -319,5 +319,5 @@ roles se comparte, recuerda la evidencia comprometida, y no devuelve nada.
 ## Pendiente
 
 - Probarlo contra un cliente simulado y ajustar las preguntas que no funcionen.
-- Escribir PROTECT, DETECT, RESPOND y RECOVER — trece dimensiones más.
+- Escritas PROTECT, DETECT, RESPOND y RECOVER, en `guion-pr-de-rs-rc.md`.
 - Los `dimension_id` de este guion ya son definitivos: son los códigos del CSF.

@@ -190,13 +190,125 @@ export const DIMENSIONES = [
     anclajes: {
       0: "Si se rompe algo se ve en el momento; no hay copias",
       1: "Hay copias de seguridad y poco más. Nunca se probó restaurarlas",
-      2: "Hay copias y algún reemplazo previsto de palabra, sin plan escrito; la restauración se probó alguna vez suelta",
+      2: "Se restauró algo alguna vez y funcionó, pero fue suelto: no hay plan escrito ni prueba programada",
       3: "Está escrito qué se levanta primero y en cuánto tiempo, y se probó al menos una vez en el último año",
       4: "Se prueba con periodicidad fija y se mide el tiempo real que llevó",
       5: "La operación tolera la caída de un componente sin que el negocio lo note",
     },
     nota_de_campo:
       "Que el proveedor diga que hace respaldos no es evidencia de que se pueda restaurar. La pregunta que decide entre 1 y 2 es si alguna vez se recuperó algo de verdad.",
+  },
+  {
+    id: "DE.CM",
+    nombre: "Monitoreo",
+    mide: "Si alguien mira lo que pasa en los sistemas, o sólo se enteran cuando algo se rompe.",
+    anclajes: {
+      0: "Nadie mira nada; se sabe cuando algo deja de funcionar",
+      1: "El antivirus avisa en la máquina de cada uno y ahí termina; no hay nada centralizado",
+      2: "Alguien de afuera dice que mira algo, pero adentro no se sabe qué ni con qué frecuencia",
+      3: "Hay alguien que revisa las alertas con una frecuencia definida y queda registro de qué se miró",
+      4: "Se mide cuánto se tarda en detectar algo y se ajusta qué se monitorea",
+      5: "El monitoreo alcanza también a los proveedores y a lo que se expone a internet",
+    },
+    nota_de_campo:
+      "La pregunta que más ordena esta dimensión es cómo se enteraron del último problema: si fue un cliente, un empleado o un sistema. Preguntala aunque ya te hayan contado el incidente.",
+  },
+  {
+    id: "DE.AE",
+    nombre: "Análisis de alertas",
+    mide: "Si cuando aparece una alerta alguien decide si es algo o no, y con qué criterio.",
+    anclajes: {
+      0: "Las alertas se ignoran o se cierran sin mirarlas",
+      1: "Se miran caso por caso, según quién esté y cuánto tiempo tenga",
+      2: "Hay una costumbre de a quién avisar, sin criterio de qué es grave y qué no",
+      3: "Está escrito qué se considera incidente y quién lo decide, y cada alerta se cierra con una conclusión",
+      4: "Se clasifican por gravedad y se mide cuántas terminaron siendo reales",
+      5: "Lo que se aprende del análisis cambia lo que se monitorea",
+    },
+  },
+  {
+    id: "RS.MA",
+    nombre: "Gestión del incidente",
+    mide: "Si hay una forma acordada de responder, o se improvisa cada vez.",
+    anclajes: {
+      0: "Se improvisa por completo; no hay a quién llamar",
+      1: "Se llama al que sabe o al proveedor, sin pasos definidos",
+      2: "Hay pasos que conocen de memoria los que estuvieron la vez anterior",
+      3: "Hay un procedimiento escrito con roles, y se usó la última vez que pasó algo",
+      4: "El procedimiento se prueba aunque no haya incidentes, y se corrige con lo aprendido",
+      5: "La respuesta está ensayada junto con los proveedores y con quien haga falta de afuera",
+    },
+  },
+  {
+    id: "RS.AN",
+    nombre: "Análisis del incidente",
+    mide: "Si después de un incidente se establece qué pasó realmente y hasta dónde llegó.",
+    anclajes: {
+      0: "No se averigua nada: se arregla y se sigue",
+      1: "Se entiende lo básico por lo que se ve, sin que quede registro",
+      2: "Se reconstruye lo que pasó de memoria, sin datos que lo respalden",
+      3: "Queda escrito qué pasó, cuándo empezó, hasta dónde llegó y cómo se supo",
+      4: "Se conserva evidencia que permite revisar el análisis más adelante",
+      5: "El análisis busca la causa de fondo y no sólo el hecho",
+    },
+    nota_de_campo:
+      "El alcance es la parte que casi nunca se establece: preguntá si supieron a qué llegó a acceder el que entró, o hasta dónde se propagó. Un incidente contado con detalle no es lo mismo que un incidente analizado.",
+  },
+  {
+    id: "RS.CO",
+    nombre: "Comunicación durante el incidente",
+    mide: "Si se sabe a quién hay que avisar, adentro y afuera, y en qué momento.",
+    anclajes: {
+      0: "No se avisa a nadie: se resuelve entre los que se enteraron",
+      1: "Se le avisa a la dirección cuando alguien decide que es grave",
+      2: "Se sabe de memoria a quién avisar adentro; para afuera se resuelve sobre la marcha",
+      3: "Está definido a quién se avisa adentro y afuera —clientes, seguro, organismos— y en qué plazo",
+      4: "Los avisos quedan registrados y después se revisa si llegaron a tiempo",
+      5: "Hay mensajes preparados de antemano y está definido quién los emite",
+    },
+    nota_de_campo:
+      "Que exista una obligación de avisar —una cláusula de un cliente, una ley— no es lo mismo que tener definido cómo se cumple. Si aparece la obligación, preguntá quién la ejecutaría y en qué plazo.",
+  },
+  {
+    id: "RS.MI",
+    nombre: "Contención del incidente",
+    mide: "Si se puede frenar el daño mientras el incidente está pasando.",
+    anclajes: {
+      0: "No hay forma de frenar nada; se espera a que alguien pueda",
+      1: "Se corta algo a mano, cuando aparece quien tiene con qué hacerlo",
+      2: "Se sabe qué habría que cortar, pero depende de que una persona en particular esté disponible",
+      3: "Está definido qué se aísla y quién tiene autoridad para hacerlo sin pedir permiso",
+      4: "La contención se practica y se mide cuánto tarda",
+      5: "Parte de la contención ocurre sola cuando se detecta el patrón",
+    },
+  },
+  {
+    id: "RC.RP",
+    nombre: "Recuperación",
+    mide: "Si se puede volver a operar, y si alguien sabe en qué orden y en cuánto tiempo.",
+    anclajes: {
+      0: "Se vuelve como se puede, sin idea de cuánto va a llevar",
+      1: "Se depende del proveedor para levantar todo; adentro no se sabe el orden ni el tiempo",
+      2: "Se sabe qué es lo primero que hay que levantar, sin plan escrito ni tiempo comprometido",
+      3: "Hay plan escrito con orden y tiempos, y se ejecutó o se probó en el último año",
+      4: "Se mide el tiempo real de recuperación contra el que se había comprometido",
+      5: "La recuperación se prueba con la operación andando",
+    },
+  },
+  {
+    id: "RC.CO",
+    nombre: "Comunicación de la recuperación",
+    mide: "Si se le avisa a quien corresponde que se volvió a la normalidad, y qué se le cuenta.",
+    anclajes: {
+      0: "Nadie avisa nada: la novedad se difunde sola y cada uno se entera por su cuenta",
+      1: "Alguien avisa de boca, puertas adentro, que ya está resuelto",
+      2: "Se avisa adentro y a los clientes que preguntaron, sin criterio de qué se cuenta",
+      3: "Está definido a quién se le informa el cierre y con qué contenido",
+      4: "Después se revisa si la comunicación alcanzó, para clientes y para el personal",
+      5: "La comunicación incluye qué se cambió para que no vuelva a pasar",
+    },
+    nota_de_campo:
+      "Si la empresa no tuvo nunca un incidente que cerrar, esto no se puede establecer con lo que la persona sabe. No lo puntúes por analogía con otra cosa: es indeterminado.",
   },
 ];
 
