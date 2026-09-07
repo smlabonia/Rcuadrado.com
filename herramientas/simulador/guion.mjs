@@ -14,19 +14,23 @@ export const DIMENSIONES = [
       4: "Se revisa con periodicidad fija y alimenta decisiones de inversión",
       5: "Un cambio en el contexto dispara la revisión sin que nadie la pida",
     },
+    nota_de_campo:
+      "El nivel 2 depende de un hecho que la persona no ofrece sola: preguntá explícitamente si alguna vez se habló del tema a raíz de un susto propio o ajeno —algo que le pasó a otra empresa conocida— o de un pedido de un cliente. Sin esa pregunta el tema queda en 1 por omisión, no por hecho.",
   },
   {
     id: "GV.RM",
     nombre: "Estrategia de gestión de riesgos",
     mide: "Si hay una forma acordada de decidir qué riesgo se acepta y cuánto se invierte.",
     anclajes: {
-      0: "No hay criterio; se compra cuando ya pasó algo",
-      1: "Decide una persona por intuición, caso por caso",
-      2: "Hay un criterio informal conocido, típicamente lo que pida el proveedor de TI",
-      3: "Hay presupuesto y criterio escrito de qué se acepta y qué no",
+      0: "Nadie decide nada de antemano: sólo se gasta después de un incidente",
+      1: "Decide una sola persona, caso por caso, sin criterio previo ni monto pensado",
+      2: "Hay un criterio informal que otros conocen y se puede enunciar, típicamente lo que recomiende el proveedor de TI. Puede haber presupuesto, pero no hay criterio escrito",
+      3: "Hay presupuesto asignado Y criterio escrito de qué se acepta y qué no",
       4: "Las decisiones se toman contra un registro de riesgos actualizado",
       5: "El nivel de riesgo aceptable está declarado y se mide contra él",
     },
+    regla_especial:
+      "Que hayan comprado algo después de un incidente no alcanza para el 0: el 0 es cuando además nadie decide de antemano. Si hay una persona que decide caso por caso, es 1. Para el 2 tiene que haber un criterio que la persona pueda enunciar y que otros conozcan, no sólo una costumbre que vos deduzcas.",
   },
   {
     id: "GV.RR",
@@ -34,8 +38,8 @@ export const DIMENSIONES = [
     mide: "Si alguien responde por esto, con tiempo y con autoridad.",
     anclajes: {
       0: "Nadie. Se resuelve por reflejo cuando pasa",
-      1: "El que sabe de computadoras, sin mandato ni tiempo asignado",
-      2: "Hay alguien reconocido informalmente por todos",
+      1: "Recae en el que sabe de computadoras, sin mandato ni tiempo asignado. Puede estar reconocido de hecho por todos: eso solo no lo sube",
+      2: "Además de estar reconocido, tiene tiempo efectivamente asignado a esto, aunque no esté escrito",
       3: "Asignado por escrito, con tiempo y con autoridad para decidir",
       4: "La responsabilidad se evalúa como parte del desempeño",
       5: "Hay reemplazo definido y la autoridad delegada por escrito",
