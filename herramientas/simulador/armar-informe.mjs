@@ -31,6 +31,10 @@ const { CLIENTE } = await import(CASO === "maduro" ? "./cliente-maduro.mjs" : ".
 // vivir en la ficha de contexto; hasta que eso exista, 3 para todo, que es la
 // meta realista que fija docs/assessments-madurez.md para PyMEs de la región.
 const META_POR_DEFECTO = 3;
+// La escala llega a 5 y el informe la muestra entera: el cliente tiene que ver
+// dónde está contra el máximo, no sólo contra su meta. La brecha, en cambio, se
+// calcula siempre contra la meta: es lo que se va a trabajar.
+const ESCALA_MAXIMA = 5;
 const metaDe = (id) => CLIENTE.metas?.[id] ?? META_POR_DEFECTO;
 
 const FUNCIONES = [
@@ -133,6 +137,31 @@ const proyectosCandidatos = brechaPriorizada.slice(0, 5).map((d, i) => ({
   esfuerzo: d.esfuerzo,
 }));
 
+// ---------- Glosario ----------
+// Las siglas del informe salen del marco y no se explican solas. Va completo:
+// también los temas que no se pudieron puntuar.
+const glosario = DIMENSIONES.map((d) => ({
+  id: d.id,
+  funcion: FUNCIONES.find((f) => f.id === d.id.slice(0, 2))?.nombre,
+  nombre: d.nombre,
+  mide: d.mide,
+}));
+
+// ---------- Ranuras de proyecto ----------
+// Una por dimensión con brecha. La etapa de redacción llena cada una con dos o
+// tres propuestas; acá sólo se declara qué habría que mover y desde dónde.
+const ranurasDeProyecto = dimensiones
+  .filter((d) => d.brecha !== null && d.brecha > 0)
+  .map((d) => ({
+    dimension: d.id,
+    nombre: d.nombre,
+    nivel: d.nivel,
+    meta: d.meta,
+    desde: d.ancla_actual,
+    hasta: d.ancla_meta,
+    hallazgo: d.hallazgo,
+  }));
+
 // ---------- El armado ----------
 const informe = {
   cliente: {
@@ -140,6 +169,7 @@ const informe = {
     fecha: new Date().toISOString().slice(0, 10),
     marco: "NIST CSF 2.0",
     escala: "0 a 5, propia y normalizada",
+    escala_maxima: ESCALA_MAXIMA,
     origen: archivo,
   },
   alcance: {
@@ -163,6 +193,8 @@ const informe = {
     id: d.id, nombre: d.nombre, nivel: d.nivel, meta: d.meta, brecha: d.brecha, esfuerzo: d.esfuerzo, firme: d.firme,
   })),
   proyectos_candidatos: proyectosCandidatos,
+  ranuras_de_proyecto: ranurasDeProyecto,
+  glosario,
   evidencia_para_validar: registro.registros.flatMap((r) =>
     (r.evidencia_para_validar ?? []).map((e) => ({ dimension: r.id, que: e.que, por_que: e.por_que })),
   ),
@@ -175,8 +207,16 @@ const informe = {
     })),
   },
   graficos: {
-    estrella: funciones.map((f) => ({ eje: f.nombre, nivel: f.nivel, meta: f.meta })),
-    barras: brechaPriorizada.map((d) => ({ etiqueta: `${d.id} ${d.nombre}`, nivel: d.nivel, meta: d.meta, brecha: d.brecha })),
+    estrella: funciones.map((f) => ({ eje: f.nombre, nivel: f.nivel, meta: f.meta, maximo: ESCALA_MAXIMA })),
+    // Tres tramos: lo que hay, lo que falta para la meta, y lo que queda hasta
+    // el máximo de la escala. El tercero es contexto, no objetivo.
+    barras: brechaPriorizada.map((d) => ({
+      etiqueta: `${d.id} ${d.nombre}`,
+      nivel: d.nivel,
+      hasta_la_meta: d.brecha,
+      resto_hasta_el_maximo: Number((ESCALA_MAXIMA - d.meta).toFixed(2)),
+      meta: d.meta,
+    })),
     sliders: dimensiones
       .filter((d) => d.nivel !== null)
       .map((d) => ({ etiqueta: d.id, nivel: d.nivel, meta: d.meta, banda: d.banda, firme: d.firme })),

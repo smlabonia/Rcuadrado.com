@@ -37,6 +37,14 @@ const conPie = (s) => pie(pres, s, ++pagina, DOC);
 const dimsDe = (fid) => inf.dimensiones.filter((d) => d.funcion === fid);
 const conNivel = (d) => d.nivel !== null && d.nivel !== undefined;
 
+// La prioridad sale de la matriz: primero lo de mayor impacto, y a igual
+// impacto lo de menor esfuerzo. Arriba queda lo que más cambia con menos.
+const PESO_IMPACTO = { alto: 0, medio: 1, bajo: 2 };
+const PESO_ESFUERZO = { bajo: 0, medio: 1, alto: 2 };
+const porPrioridad = (a, b) =>
+  (PESO_IMPACTO[a.impacto] ?? 1) - (PESO_IMPACTO[b.impacto] ?? 1) ||
+  (PESO_ESFUERZO[a.esfuerzo] ?? 1) - (PESO_ESFUERZO[b.esfuerzo] ?? 1);
+
 // ─────────── Portada ───────────
 {
   const s = lamina();
@@ -71,6 +79,52 @@ const conNivel = (d) => d.nivel !== null && d.nivel !== undefined;
     s.addText(t, { x: x + 0.3, y: y + 0.9, w: 3.15, h: 0.7, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 15, color: C.ink, bold: true });
   });
   conPie(s);
+}
+
+// ─────────── Resumen ejecutivo en una lámina ───────────
+// Todo lo que hay que saber, en una sola página. Si la reunión se corta acá o
+// si esto es lo único que circula por mail, tiene que alcanzar.
+{
+  const s = lamina();
+  s.background = { color: C.paper };
+  encabezado(pres, s, "Resumen ejecutivo", "Todo en una página");
+
+  // Bloque de cifras.
+  const cifra = (x, w, et, val, sub, color = C.ink) => {
+    tarjeta(pres, s, x, 1.95, w, 1.35);
+    etiqueta(s, et, x + 0.25, 2.12, C.muted, 8, w - 0.5);
+    s.addText(String(val), { x: x + 0.25, y: 2.35, w: w - 0.5, h: 0.65, isTextBox: true, margin: 0, fontFace: F.display, fontSize: 40, color, bold: true });
+    s.addText(sub, { x: x + 0.25, y: 2.95, w: w - 0.5, h: 0.28, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 10, color: C.muted });
+  };
+  cifra(M, 2.6, "Nivel general", n(inf.resumen.nivel_general), `meta ${n(inf.resumen.meta_general)} · escala hasta ${inf.cliente.escala_maxima}`);
+  cifra(M + 2.75, 2.6, "Temas relevados", `${inf.alcance.puntuadas}/${inf.alcance.dimensiones}`, `${inf.alcance.derivadas} derivado(s), ${inf.alcance.indeterminadas} sin establecer`);
+  cifra(M + 5.5, 2.6, "No espera", inf.acciones_inmediatas.length, "acción inmediata", C.coralText);
+  cifra(M + 8.25, 2.83, "Propuestas", (txt.proyectos ?? []).length, "para el taller");
+
+  // La frase de estado.
+  s.addText(txt.frase_estado ?? "", { x: M, y: 3.5, w: 11.83, h: 0.85, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 15, color: C.ink, bold: true, lineSpacing: 21 });
+
+  // Función por función, en una fila.
+  etiqueta(s, "Función por función, hoy sobre la meta", M, 4.32, C.coralText, 9, 6);
+  inf.funciones.forEach((f, i) => {
+    const x = M + i * 1.98;
+    s.addText(f.nombre, { x, y: 4.6, w: 1.85, h: 0.28, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 11, color: C.muted2 });
+    s.addText(`${n(f.nivel)} / ${n(f.meta)}`, { x, y: 4.85, w: 1.85, h: 0.35, isTextBox: true, margin: 0, fontFace: F.display, fontSize: 22, color: C.ink, bold: true });
+    s.addShape(pres.ShapeType.rect, { x, y: 5.26, w: 1.7, h: 0.1, fill: { color: C.line } });
+    s.addShape(pres.ShapeType.rect, { x, y: 5.26, w: 1.7 * Math.min(1, (f.nivel ?? 0) / inf.cliente.escala_maxima), h: 0.1, fill: { color: C.coral } });
+    // marca de la meta sobre la escala completa
+    s.addShape(pres.ShapeType.rect, { x: x + 1.7 * (f.meta / inf.cliente.escala_maxima), y: 5.21, w: 0.02, h: 0.2, fill: { color: C.ink } });
+  });
+
+  // Lo más urgente y lo primero a hacer.
+  const top = [...(txt.proyectos ?? [])].sort(porPrioridad).slice(0, 3);
+  etiqueta(s, "Por dónde se empieza", M, 5.62, C.coralText, 9, 6);
+  top.forEach((pr, i) => {
+    s.addText(`${i + 1}. ${pr.nombre}`, { x: M, y: 5.9 + i * 0.23, w: 7.2, h: 0.24, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 11, color: C.muted2 });
+    s.addText(`${pr.dimension} · esfuerzo ${pr.esfuerzo} · impacto ${pr.impacto}`, { x: 8.2, y: 5.9 + i * 0.23, w: 4.4, h: 0.24, isTextBox: true, margin: 0, fontFace: F.mono, fontSize: 9, color: C.muted, charSpacing: 1 });
+  });
+  conPie(s);
+  s.addNotes("Esta es la lámina que circula por mail si no circula nada más.");
 }
 
 // ─────────── 01 · Dónde están hoy ───────────
@@ -138,6 +192,62 @@ separador(pres, lamina(), "02", "Cómo se midió", "La escala, la meta y qué se
   conPie(s);
 }
 
+// ─────────── El marco y el glosario ───────────
+{
+  const s = lamina();
+  s.background = { color: C.paper };
+  encabezado(pres, s, "02 · Cómo se midió", "El marco");
+  s.addText(
+    [
+      { text: "NIST CSF 2.0", options: { bold: true, color: C.ink } },
+      { text: " es el marco de ciberseguridad del Instituto Nacional de Estándares y Tecnología del gobierno de Estados Unidos. Es de dominio público, no hay que licenciarlo, y es la referencia más usada del mundo para ordenar este tema. La versión 2.0 es de 2024.", options: { color: C.muted2, breakLine: true } },
+      { text: "", options: { breakLine: true } },
+      { text: "Se organiza en seis funciones y veintidós categorías. ", options: { bold: true, color: C.ink } },
+      { text: "Las funciones son las seis preguntas grandes; las categorías, los temas concretos dentro de cada una. Se relevaron las veintidós: no es una muestra.", options: { color: C.muted2, breakLine: true } },
+      { text: "", options: { breakLine: true } },
+      { text: "La escala 0-5 es propia. ", options: { bold: true, color: C.ink } },
+      { text: "El marco no trae puntajes: describe prácticas. La escala la define R² para que el resultado sea comparable entre diagnósticos y entre las distintas áreas que medimos.", options: { color: C.muted2 } },
+    ],
+    { x: M, y: 2.0, w: 6.4, h: 3.6, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 13, lineSpacing: 19 },
+  );
+
+  const funcs = [
+    ["GV", "Gobernar", "Quién responde, con qué reglas y con qué presupuesto"],
+    ["ID", "Identificar", "Qué hay que proteger y qué puede salir mal"],
+    ["PR", "Proteger", "Qué se hace para que no pase"],
+    ["DE", "Detectar", "Cómo se enteran cuando pasa"],
+    ["RS", "Responder", "Qué se hace mientras está pasando"],
+    ["RC", "Recuperar", "Cómo se vuelve a trabajar"],
+  ];
+  tarjeta(pres, s, 7.15, 2.0, 5.45, 3.85);
+  etiqueta(s, "Las seis funciones", 7.45, 2.2, C.coralText, 9, 4.9);
+  funcs.forEach(([sigla, nombre, que], i) => {
+    const y = 2.58 + i * 0.55;
+    s.addText(sigla, { x: 7.45, y, w: 0.5, h: 0.28, isTextBox: true, margin: 0, fontFace: F.mono, fontSize: 11, color: C.coralText, bold: true, charSpacing: 1 });
+    s.addText(nombre, { x: 8.0, y, w: 1.5, h: 0.28, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 12, color: C.ink, bold: true });
+    s.addText(que, { x: 9.5, y: y + 0.02, w: 2.9, h: 0.35, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 9.5, color: C.muted });
+  });
+  conPie(s);
+}
+
+// El glosario, en dos láminas de once.
+for (const mitad of [0, 1]) {
+  const s = lamina();
+  s.background = { color: C.paper };
+  encabezado(pres, s, "02 · Cómo se midió", mitad === 0 ? "Los veintidós temas" : "Los veintidós temas (continúa)");
+  const items = inf.glosario.slice(mitad * 11, mitad * 11 + 11);
+  items.forEach((g, i) => {
+    const y = 2.0 + i * 0.42;
+    const d = inf.dimensiones.find((x) => x.id === g.id);
+    s.addText(g.id, { x: M, y, w: 0.85, h: 0.3, isTextBox: true, margin: 0, fontFace: F.mono, fontSize: 10, color: C.coralText, bold: true, charSpacing: 1 });
+    s.addText(g.nombre, { x: M + 0.95, y, w: 2.9, h: 0.3, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 11.5, color: C.ink, bold: true });
+    s.addText(g.mide, { x: M + 3.95, y: y + 0.01, w: 7.0, h: 0.32, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 10, color: C.muted });
+    const nivel = d && d.nivel !== null ? `${n(d.nivel)}/${n(d.meta)}` : d?.estado === "derivado" ? "pend." : "—";
+    s.addText(nivel, { x: 11.9, y, w: 0.7, h: 0.3, isTextBox: true, margin: 0, fontFace: F.mono, fontSize: 10, color: C.muted2, align: "right" });
+  });
+  conPie(s);
+}
+
 // ─────────── 03 · El panorama ───────────
 separador(pres, lamina(), "03", "El panorama", `Las seis funciones de ${inf.cliente.marco}`);
 
@@ -187,16 +297,17 @@ separador(pres, lamina(), "03", "El panorama", `Las seis funciones de ${inf.clie
     [
       { name: "Hoy", labels: top.map((d) => `${d.id} ${d.nombre}`), values: top.map((d) => d.nivel) },
       { name: "Falta para la meta", labels: top.map((d) => `${d.id} ${d.nombre}`), values: top.map((d) => d.brecha) },
+      { name: "Resto de la escala", labels: top.map((d) => `${d.id} ${d.nombre}`), values: top.map((d) => inf.cliente.escala_maxima - d.meta) },
     ],
     {
       x: M, y: 1.95, w: W - M * 2, h: 4.1,
       barDir: "bar", barGrouping: "stacked",
-      chartColors: [C.coral, C.paper2],
+      chartColors: [C.coral, C.paper2, C.paper],
       showValue: true, dataLabelPosition: "ctr", dataLabelColor: C.ink,
       dataLabelFontFace: F.mono, dataLabelFontSize: 10,
       catAxisLabelColor: C.muted2, catAxisLabelFontFace: F.sans, catAxisLabelFontSize: 11,
       valAxisLabelColor: C.muted, valAxisLabelFontFace: F.mono, valAxisLabelFontSize: 9,
-      valAxisMaxVal: inf.resumen.meta_general, valGridLine: { color: C.line, size: 1 }, catGridLine: { style: "none" },
+      valAxisMaxVal: inf.cliente.escala_maxima, valGridLine: { color: C.line, size: 1 }, catGridLine: { style: "none" },
       showLegend: true, legendPos: "b", legendColor: C.muted2, legendFontFace: F.sans, legendFontSize: 11,
       barGapWidthPct: 60,
     },
@@ -256,24 +367,66 @@ if (inf.acciones_inmediatas.length) {
   conPie(s);
 }
 
+// La matriz esfuerzo-impacto: es la lámina que ordena la conversación del taller.
 {
   const s = lamina();
   s.background = { color: C.paper };
-  encabezado(pres, s, "05 · Qué sigue", "Por dónde empezar");
-  s.addText("Propuestas para conversar en el taller, ordenadas por brecha. No son indicaciones: el plan se arma con ustedes.", { x: M, y: 1.95, w: 10.5, h: 0.35, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 14, color: C.muted });
-  const proys = inf.proyectos_candidatos.slice(0, 4);
-  proys.forEach((p, i) => {
+  encabezado(pres, s, "05 · Qué sigue", "Proyectos de madurez");
+  s.addText(`${(txt.proyectos ?? []).length} propuestas sobre ${inf.ranuras_de_proyecto.length} temas. Dos o tres caminos por tema, con distinto alcance. Son para conversar en el taller: el plan se arma con ustedes.`, { x: M, y: 1.95, w: 11.8, h: 0.5, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 13, color: C.muted, lineSpacing: 18 });
+
+  // Cuadrícula 3x3. Eje horizontal esfuerzo, vertical impacto.
+  const x0 = 2.0, y0 = 2.7, celda = 1.25;
+  const esfuerzos = ["bajo", "medio", "alto"];
+  const impactos = ["alto", "medio", "bajo"];
+  etiqueta(s, "Impacto", 0.75, 2.6, C.muted, 8, 1.2);
+  etiqueta(s, "Esfuerzo →", 0.75, y0 + celda * 3 + 0.12, C.muted, 8, 1.2);
+  impactos.forEach((imp, fila) => {
+    s.addText(imp, { x: 0.75, y: y0 + fila * celda + celda / 2 - 0.13, w: 1.1, h: 0.26, isTextBox: true, margin: 0, fontFace: F.mono, fontSize: 9, color: C.muted, charSpacing: 1, align: "right" });
+    esfuerzos.forEach((esf, col) => {
+      const x = x0 + col * celda;
+      const y = y0 + fila * celda;
+      // El cuadrante que más rinde —alto impacto, bajo esfuerzo— se destaca.
+      const estrella = imp === "alto" && esf === "bajo";
+      s.addShape(pres.ShapeType.rect, { x, y, w: celda - 0.06, h: celda - 0.06, fill: { color: estrella ? C.paper2 : C.paper }, line: { color: C.line, width: 1 } });
+      const cuantos = (txt.proyectos ?? []).filter((p) => p.esfuerzo === esf && p.impacto === imp);
+      if (cuantos.length) {
+        s.addText(String(cuantos.length), { x: x + 0.1, y: y + 0.18, w: celda - 0.26, h: 0.55, isTextBox: true, margin: 0, fontFace: F.display, fontSize: 34, color: estrella ? C.coralText : C.muted2, bold: true, align: "center" });
+        s.addText(cuantos.length === 1 ? "propuesta" : "propuestas", { x: x + 0.1, y: y + 0.72, w: celda - 0.26, h: 0.25, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 9, color: C.muted, align: "center" });
+      }
+    });
+  });
+  esfuerzos.forEach((esf, col) => {
+    s.addText(esf, { x: x0 + col * celda, y: y0 + celda * 3 + 0.12, w: celda - 0.06, h: 0.25, isTextBox: true, margin: 0, fontFace: F.mono, fontSize: 9, color: C.muted, charSpacing: 1, align: "center" });
+  });
+
+  tarjeta(pres, s, 6.4, 2.7, 6.2, 3.75);
+  etiqueta(s, "Las primeras seis", 6.7, 2.92, C.coralText, 9, 5.6);
+  [...(txt.proyectos ?? [])].sort(porPrioridad).slice(0, 6).forEach((pr, i) => {
+    const y = 3.3 + i * 0.5;
+    s.addText(`${i + 1}`, { x: 6.7, y, w: 0.3, h: 0.28, isTextBox: true, margin: 0, fontFace: F.display, fontSize: 18, color: C.coralText, bold: true });
+    s.addText(pr.nombre, { x: 7.05, y: y + 0.02, w: 3.7, h: 0.28, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 11.5, color: C.ink });
+    s.addText(`${pr.esfuerzo} / ${pr.impacto}`, { x: 10.85, y: y + 0.03, w: 1.5, h: 0.26, isTextBox: true, margin: 0, fontFace: F.mono, fontSize: 9, color: C.muted, charSpacing: 1, align: "right" });
+  });
+  conPie(s);
+  s.addNotes("El cuadrante destacado —alto impacto, bajo esfuerzo— es por donde conviene arrancar. La matriz ordena la discusión sin que nadie tenga que defender un orden.");
+}
+
+// El detalle de las propuestas mejor ubicadas.
+{
+  const s = lamina();
+  s.background = { color: C.paper };
+  encabezado(pres, s, "05 · Qué sigue", "Las cuatro primeras");
+  s.addText("Ordenadas por impacto y esfuerzo. El resto está en el informe escrito, agrupado por tema.", { x: M, y: 1.95, w: 11.5, h: 0.35, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 13, color: C.muted });
+  [...(txt.proyectos ?? [])].sort(porPrioridad).slice(0, 4).forEach((pr, i) => {
     const x = M + (i % 2) * 6.15;
     const y = 2.5 + Math.floor(i / 2) * 2.02;
-    const red = txt.proyectos?.find((r) => r.orden === p.orden);
-    const dim = inf.dimensiones.find((d) => d.id === p.mueve);
+    const dim = inf.dimensiones.find((d) => d.id === pr.dimension);
     tarjeta(pres, s, x, y, 5.85, 1.88);
-    s.addText(String(p.orden), { x: x + 0.3, y: y + 0.22, w: 0.5, h: 0.45, isTextBox: true, margin: 0, fontFace: F.display, fontSize: 28, color: C.coralText, bold: true });
-    s.addText(red?.nombre ?? p.nombre_tentativo, { x: x + 0.85, y: y + 0.25, w: 4.7, h: 0.35, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 14, color: C.ink, bold: true });
-    s.addText(`${p.mueve} · de ${n(dim?.nivel)} a ${n(dim?.meta)} · esfuerzo ${p.esfuerzo ?? "—"}`, { x: x + 0.85, y: y + 0.63, w: 4.7, h: 0.26, isTextBox: true, margin: 0, fontFace: F.mono, fontSize: 9, color: C.muted, charSpacing: 1 });
-    // Dos oraciones entran; tres se salen de la tarjeta.
-    const desc = (red?.descripcion ?? "").split(". ").slice(0, 2).join(". ");
-    s.addText(desc.length > 190 ? desc.slice(0, desc.lastIndexOf(" ", 190)) + "…" : desc, { x: x + 0.85, y: y + 0.97, w: 4.7, h: 0.8, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 10.5, color: C.muted, lineSpacing: 14 });
+    s.addText(String(i + 1), { x: x + 0.3, y: y + 0.22, w: 0.5, h: 0.45, isTextBox: true, margin: 0, fontFace: F.display, fontSize: 28, color: C.coralText, bold: true });
+    s.addText(pr.nombre, { x: x + 0.85, y: y + 0.25, w: 4.7, h: 0.35, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 14, color: C.ink, bold: true });
+    s.addText(`${pr.dimension} ${dim?.nombre ?? ""} · esfuerzo ${pr.esfuerzo} · impacto ${pr.impacto}`, { x: x + 0.85, y: y + 0.63, w: 4.7, h: 0.26, isTextBox: true, margin: 0, fontFace: F.mono, fontSize: 8.5, color: C.muted, charSpacing: 1 });
+    const d = pr.descripcion ?? "";
+    s.addText(d.length > 190 ? d.slice(0, d.lastIndexOf(" ", 190)) + "…" : d, { x: x + 0.85, y: y + 0.97, w: 4.7, h: 0.8, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 10.5, color: C.muted, lineSpacing: 14 });
   });
   conPie(s);
 }
@@ -317,6 +470,40 @@ if (inf.evidencia_para_validar.length) {
     s.addText(e.que, { x: M + 1.0, y, w: 10.8, h: 0.35, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 12, color: C.muted2 });
   });
   conPie(s);
+}
+
+// Comparación. La estructura existe; los números NO se inventan.
+{
+  const s = lamina();
+  s.background = { color: C.paper };
+  encabezado(pres, s, "06 · Alcance", "Contra qué se compara");
+  s.addText(
+    [
+      { text: "Contra la meta y contra la escala completa. ", options: { bold: true, color: C.ink } },
+      { text: `Hoy el resultado se lee contra la meta acordada de ${n(inf.resumen.meta_general)} y contra el máximo de la escala, que es ${inf.cliente.escala_maxima}. Las dos referencias están en todos los gráficos.
+
+`, options: { color: C.muted2 } },
+      { text: "Contra otras empresas, todavía no. ", options: { bold: true, color: C.ink } },
+      { text: "R² no publica un comparativo por industria o por tamaño porque no tiene una fuente propia que lo sostenga, y usar cifras de terceros sin poder verificarlas sería peor que no dar ninguna.", options: { color: C.muted2, breakLine: true } },
+      { text: "", options: { breakLine: true } },
+      { text: "De dónde va a salir. ", options: { bold: true, color: C.ink } },
+      { text: "De estos mismos diagnósticos. Cada empresa que se mide con la misma escala suma un punto de comparación real, verificable y propio. A partir de una cantidad razonable, el informe podrá decir dónde está esta empresa respecto de las demás de su tamaño y su sector.", options: { color: C.muted2 } },
+    ],
+    { x: M, y: 2.0, w: 7.2, h: 3.6, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 13, lineSpacing: 19 },
+  );
+  tarjeta(pres, s, 8.5, 2.0, 4.1, 2.5);
+  etiqueta(s, "Las dos referencias de hoy", 8.8, 2.22, C.coralText, 9, 3.5);
+  s.addText(`${n(inf.resumen.nivel_general)}`, { x: 8.8, y: 2.55, w: 1.6, h: 0.7, isTextBox: true, margin: 0, fontFace: F.display, fontSize: 44, color: C.ink, bold: true });
+  s.addText(`meta ${n(inf.resumen.meta_general)}
+escala hasta ${inf.cliente.escala_maxima}`, { x: 10.3, y: 2.7, w: 2.1, h: 0.6, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 12, color: C.muted, lineSpacing: 17 });
+  s.addShape(pres.ShapeType.rect, { x: 8.8, y: 3.5, w: 3.5, h: 0.14, fill: { color: C.line } });
+  s.addShape(pres.ShapeType.rect, { x: 8.8, y: 3.5, w: 3.5 * (inf.resumen.nivel_general / inf.cliente.escala_maxima), h: 0.14, fill: { color: C.coral } });
+  s.addShape(pres.ShapeType.rect, { x: 8.8 + 3.5 * (inf.resumen.meta_general / inf.cliente.escala_maxima), y: 3.44, w: 0.025, h: 0.26, fill: { color: C.ink } });
+  etiqueta(s, "0", 8.8, 3.72, C.muted, 8, 0.4);
+  etiqueta(s, `${inf.cliente.escala_maxima}`, 12.1, 3.72, C.muted, 8, 0.4);
+  s.addText("La marca de tinta es la meta.", { x: 8.8, y: 4.0, w: 3.5, h: 0.3, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 11, color: C.muted });
+  conPie(s);
+  s.addNotes("Si el cliente pregunta cómo está contra otros: hoy no hay dato propio y no se usan cifras de terceros sin verificar. Se construye con los diagnósticos que R² va haciendo.");
 }
 
 // ─────────── Cierre ───────────

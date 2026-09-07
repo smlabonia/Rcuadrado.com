@@ -70,17 +70,35 @@ Sólo un objeto JSON, sin texto alrededor, con estas claves:
   "narrativa": un objeto con una clave por función —GV, ID, PR, DE, RS, RC— y un
     párrafo corto en cada una, que explique qué se vio en esa función y por qué
     quedó donde quedó. Apoyate en los hallazgos que te paso.
-  "proyectos": una lista, en el mismo orden que te llega, con { "orden",
-    "nombre", "descripcion" }. El nombre es corto y en infinitivo: "Ordenar los
-    accesos de terceros". La descripción son dos o tres oraciones: qué resuelve,
-    qué haría falta, y en qué cambia la situación. Marcalo como propuesta para
-    conversar, no como una indicación.
+  "proyectos": una lista. Para CADA ranura de proyecto que te llega, escribí DOS
+    o TRES propuestas distintas de cómo cerrar esa brecha. No son variantes de
+    la misma idea con otras palabras: son caminos distintos, con costo y alcance
+    distintos. Típicamente una mínima que resuelve lo básico con poco, y otra
+    más completa que además deja la práctica instalada.
+
+    Cada propuesta es { "dimension", "nombre", "descripcion", "esfuerzo",
+    "impacto" }.
+
+    - "dimension" es el código de la ranura, tal cual te llega.
+    - "nombre" corto y en infinitivo: "Ordenar los accesos de terceros".
+    - "descripcion" dos oraciones: qué se hace y en qué cambia la situación.
+    - "esfuerzo" es cuánto cuesta hacerlo —"bajo", "medio" o "alto"— pensando en
+      una PyME industrial sin equipo de sistemas dedicado. Bajo es algo que se
+      resuelve en días con la gente que ya está. Alto necesita plata, un tercero
+      o varios meses.
+    - "impacto" es cuánto mejora la situación real si se hace —"bajo", "medio" o
+      "alto"—. No es lo mismo que subir el nivel: algo puede subir un nivel y
+      cambiar poco, y algo puede no mover el nivel y evitar el incidente que los
+      pararía dos días. Pensá en el daño que evita, no en el puntaje.
+
+    Que las dos dimensiones sean honestas: si todo sale "medio" el cliente no
+    puede priorizar nada, que es para lo que sirve esto.
 `.trim();
 
 async function escribir() {
   const r = await client.chat.completions.create({
     model: MODELO,
-    max_tokens: 12000,
+    max_tokens: 24000,
     messages: [
       { role: "system", content: REDACTOR },
       { role: "user", content: `EL INFORME ARMADO\n\n${JSON.stringify(inf, null, 1)}` },
@@ -146,18 +164,22 @@ if (inf.acciones_inmediatas.length) {
   md.push("");
 }
 
-if (inf.proyectos_candidatos.length) {
-  p("### Los primeros proyectos");
-  p("*Propuestas para conversar en el taller, no indicaciones. Se ordenan por brecha.*");
-  for (const pr of inf.proyectos_candidatos) {
-    const red = texto?.proyectos?.find((x) => x.orden === pr.orden);
-    const dim = inf.dimensiones.find((x) => x.id === pr.mueve);
-    md.push(
-      `**${pr.orden}. ${red?.nombre ?? pr.nombre_tentativo}** · mueve ${pr.mueve} ` +
-        `de ${n(dim?.nivel)} a ${n(dim?.meta)} · esfuerzo ${pr.esfuerzo ?? "—"}`,
-    );
-    md.push("", red?.descripcion ?? falta, "");
-    md.push(`> Hoy: ${pr.desde}`, `> Meta: ${pr.hasta}`, "");
+// Las propuestas, agrupadas por tema y ordenadas por la matriz esfuerzo-impacto.
+const pesoImp = { alto: 0, medio: 1, bajo: 2 };
+const pesoEsf = { bajo: 0, medio: 1, alto: 2 };
+const propuestas = [...(texto?.proyectos ?? [])].sort(
+  (a, b) => pesoImp[a.impacto] - pesoImp[b.impacto] || pesoEsf[a.esfuerzo] - pesoEsf[b.esfuerzo],
+);
+if (propuestas.length) {
+  p("### Proyectos de madurez");
+  p("*Propuestas para conversar en el taller, no indicaciones. Ordenadas por impacto y esfuerzo: arriba lo que más cambia con menos.*");
+  md.push("| # | Propuesta | Tema | Esfuerzo | Impacto |", "|---|---|---|---|---|");
+  propuestas.forEach((pr, i) =>
+    md.push(`| ${i + 1} | ${pr.nombre} | ${pr.dimension} | ${pr.esfuerzo} | ${pr.impacto} |`),
+  );
+  md.push("");
+  for (const pr of propuestas) {
+    md.push(`**${pr.nombre}** · ${pr.dimension} · esfuerzo ${pr.esfuerzo} · impacto ${pr.impacto}`, "", pr.descripcion, "");
   }
 }
 
