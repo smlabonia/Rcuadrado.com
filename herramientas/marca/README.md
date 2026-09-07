@@ -30,3 +30,22 @@ Resuelve la aplicación del manual a láminas. No resuelve lo que el propio manu
 declara faltante: el logo como archivo distribuible para fondos claros y
 oscuros, y la foto propia. La plantilla usa el isotipo como texto, que funciona
 mientras el display esté instalado.
+
+## Instalar las tipografías
+
+`fuentes-escritorio.py` genera los `.ttf` desde los `woff2` del sitio. En
+Windows, copiar los archivos y escribir el registro **no alcanza**: las
+aplicaciones no ven la fuente hasta el próximo inicio de sesión. Hay que
+registrarlas también en la sesión con `AddFontResourceW` y avisar con
+`WM_FONTCHANGE`.
+
+```powershell
+# por usuario, sin permisos de administrador
+$dst = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"
+# copiar los .ttf a $dst, registrarlos en
+# HKCU:\Software\Microsoft\Windows NT\CurrentVersion\Fonts
+# y después AddFontResourceW por archivo + SendMessage WM_FONTCHANGE
+```
+
+Para desinstalarlas: borrar los `.ttf` de esa carpeta y sus valores del
+registro en `HKCU`.

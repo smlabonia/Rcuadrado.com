@@ -93,11 +93,13 @@ function pie(s, n) {
   });
 }
 
-// Encabezado de lámina de contenido.
+// Encabezado de lámina de contenido. La banda de arena le da al encabezado una
+// zona propia: sin ella el título flota y la lámina no se lee como documento.
 function encabezado(s, seccion, titulo) {
-  etiqueta(s, seccion, M, 0.55, C.coralText, 10);
+  s.addShape(pres.ShapeType.rect, { x: 0, y: 0, w: W, h: 1.72, fill: { color: C.paper2 } });
+  etiqueta(s, seccion, M, 0.52, C.coralText, 10);
   s.addText(titulo.toUpperCase(), {
-    x: M, y: 0.85, w: W - M * 2, h: 0.8, isTextBox: true, margin: 0,
+    x: M, y: 0.82, w: W - M * 2, h: 0.75, isTextBox: true, margin: 0,
     fontFace: F.display, fontSize: 40, color: C.ink, bold: true,
   });
 }
@@ -109,7 +111,7 @@ const nota = (s, t) => s.addNotes(t);
 // Portada A — tinta plena. La que usaría por defecto.
 {
   const s = pres.addSlide();
-  s.background = { color: C.ink };
+  s.background = { color: C.ink2 };
   grilla(s, true);
   s.addText("R²", {
     x: M, y: 0.6, w: 2, h: 1, isTextBox: true, margin: 0,
@@ -133,7 +135,6 @@ const nota = (s, t) => s.addNotes(t);
   const s = pres.addSlide();
   s.background = { color: C.paper };
   grilla(s, false);
-  s.addShape(pres.ShapeType.rect, { x: 0, y: 0, w: 0.35, h: H, fill: { color: C.ink } });
   s.addText("R²", {
     x: 1.1, y: 0.6, w: 2, h: 1, isTextBox: true, margin: 0,
     fontFace: F.display, fontSize: 48, color: C.ink, bold: true,
@@ -245,7 +246,7 @@ const nota = (s, t) => s.addNotes(t);
 // Separador A — tinta plena con numeral grande.
 {
   const s = pres.addSlide();
-  s.background = { color: C.ink };
+  s.background = { color: C.ink2 };
   grilla(s, true);
   s.addText("03", {
     x: M, y: 1.5, w: 3, h: 2.2, isTextBox: true, margin: 0,
@@ -292,25 +293,25 @@ const nota = (s, t) => s.addNotes(t);
   encabezado(s, "03 · El panorama", "Dónde está hoy");
   s.addText(
     "Este es el formato base para cualquier lámina de texto. El encabezado lleva la sección en mono arriba y el título en display debajo, siempre en mayúsculas. El cuerpo va en IBM Plex Sans a 15 puntos, alineado a la izquierda y nunca centrado.",
-    { x: M, y: 1.95, w: 5.7, h: 1.6, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 15, color: C.muted2, lineSpacing: 22 },
+    { x: M, y: 2.1, w: 5.7, h: 1.6, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 15, color: C.muted, lineSpacing: 22 },
   );
   s.addText(
     "El ancho de columna está pensado para unos sesenta caracteres por línea. Más ancho que eso y el ojo se pierde al volver; más angosto, el texto se corta demasiado seguido.",
-    { x: M, y: 3.6, w: 5.7, h: 1.4, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 15, color: C.muted2, lineSpacing: 22 },
+    { x: M, y: 3.6, w: 5.7, h: 1.4, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 15, color: C.muted, lineSpacing: 22 },
   );
-  s.addShape(pres.ShapeType.rect, { x: 7.05, y: 1.95, w: 5.5, h: 3.6, fill: { color: C.paper2 }, line: { color: C.line, width: 1 } });
+  s.addShape(pres.ShapeType.rect, { x: 7.05, y: 2.1, w: 5.5, h: 3.6, fill: { color: C.paper2 }, line: { color: C.line, width: 1 } });
   etiqueta(s, "Bloque destacado", 7.4, 2.25, C.coralText, 9);
   s.addText("1,1", {
-    x: 7.4, y: 2.6, w: 2.5, h: 1.1, isTextBox: true, margin: 0,
+    x: 7.4, y: 2.75, w: 2.5, h: 1.1, isTextBox: true, margin: 0,
     fontFace: F.display, fontSize: 76, color: C.ink, bold: true,
   });
   s.addText("sobre una meta de 3", {
-    x: 7.4, y: 3.75, w: 4.8, h: 0.35, isTextBox: true, margin: 0,
+    x: 7.4, y: 3.9, w: 4.8, h: 0.35, isTextBox: true, margin: 0,
     fontFace: F.sans, fontSize: 15, color: C.muted,
   });
   s.addText(
     "La cifra grande va en display. Es el único lugar donde un número se lleva la lámina, y funciona porque al lado está la meta: el número solo invita a discutir el número.",
-    { x: 7.4, y: 4.25, w: 4.8, h: 1, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 12, color: C.muted, lineSpacing: 17 },
+    { x: 7.4, y: 4.4, w: 4.8, h: 1, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 12, color: C.muted, lineSpacing: 17 },
   );
   pie(s, 8);
   nota(s, "Contenido A — dos columnas, texto a la izquierda y bloque destacado a la derecha. Encabezado, pie, número de página. Es la lámina que más se repite en el informe.");
@@ -339,9 +340,9 @@ const nota = (s, t) => s.addNotes(t);
   };
   caja(8.55, "Hoy", "1", "de 5");
   caja(10.85, "Meta", "3", "de 5");
-  s.addShape(pres.ShapeType.rect, { x: 8.55, y: 3.55, w: 4.4, h: 1.35, fill: { color: C.ink } });
-  etiqueta(s, "Esfuerzo estimado", 8.77, 3.75, C.onDarkMuted, 8);
-  s.addText("MEDIO", { x: 8.77, y: 4.0, w: 4, h: 0.6, isTextBox: true, margin: 0, fontFace: F.display, fontSize: 38, color: C.amber, bold: true });
+  s.addShape(pres.ShapeType.rect, { x: 8.55, y: 3.55, w: 4.4, h: 1.35, fill: { color: C.paper2 }, line: { color: C.line, width: 1 } });
+  etiqueta(s, "Esfuerzo estimado", 8.77, 3.75, C.muted, 8);
+  s.addText("MEDIO", { x: 8.77, y: 4.0, w: 4, h: 0.6, isTextBox: true, margin: 0, fontFace: F.display, fontSize: 38, color: C.amberInk, bold: true });
   pie(s, 14);
   nota(s, "Contenido B — hallazgo con cita. La cita va en Plex Sans en cursiva, con la marca de coral al costado como único acento. La atribución es siempre por rol, nunca por nombre.");
 }
@@ -401,11 +402,11 @@ const nota = (s, t) => s.addNotes(t);
   etiqueta(s, "Cómo se lee", 8.2, 2.2, C.coralText, 9);
   s.addText(
     "La estrella compara las seis funciones contra la meta. Se promedia dentro de cada función y después entre funciones: promediar los veintidós temas de una haría pesar a Gobernar el triple que a Recuperar, que tiene seis categorías contra dos.",
-    { x: 8.2, y: 2.55, w: 4.1, h: 1.6, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 13, color: C.muted2, lineSpacing: 19 },
+    { x: 8.2, y: 2.55, w: 4.1, h: 1.6, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 13, color: C.muted, lineSpacing: 19 },
   );
   s.addText(
     "Dos series y nada más. El coral es lo que hay hoy; la tinta, la meta. Sumar una tercera serie —el promedio del sector, el año pasado— convierte la estrella en un ovillo.",
-    { x: 8.2, y: 4.3, w: 4.1, h: 1.4, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 13, color: C.muted2, lineSpacing: 19 },
+    { x: 8.2, y: 4.3, w: 4.1, h: 1.4, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 13, color: C.muted, lineSpacing: 19 },
   );
   pie(s, 9);
   nota(s, "Gráfico B — estrella. Es el gráfico que va en la primera página. Dos series como máximo. El ámbar queda libre para marcar una función bajo revisión, si hiciera falta.");
@@ -414,7 +415,7 @@ const nota = (s, t) => s.addNotes(t);
 // ═══════════════ Cierre ═══════════════
 {
   const s = pres.addSlide();
-  s.background = { color: C.ink };
+  s.background = { color: C.ink2 };
   grilla(s, true);
   s.addText("R²", {
     x: M, y: 2.4, w: 3, h: 1.2, isTextBox: true, margin: 0,
