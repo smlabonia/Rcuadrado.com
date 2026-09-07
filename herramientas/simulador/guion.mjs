@@ -130,6 +130,8 @@ export const DIMENSIONES = [
   {
     id: "PR.AA",
     nombre: "Gestión de identidades y accesos",
+    pregunta_sola:
+      "¿Qué pasa cuando se termina el trabajo de un proveedor externo? ¿Quién le da de baja el acceso, y cuándo?",
     mide: "Si se sabe quién puede entrar a cada sistema, y si eso se corta cuando la persona deja de necesitarlo.",
     anclajes: {
       0: "Se trabaja con usuarios compartidos y nadie sabe con certeza quién entra a qué",
@@ -216,6 +218,8 @@ export const DIMENSIONES = [
   {
     id: "DE.AE",
     nombre: "Análisis de alertas",
+    pregunta_sola:
+      "¿Hay alguna alerta o algo raro dando vueltas ahora mismo, sin resolver?",
     mide: "Si cuando aparece una alerta alguien decide si es algo o no, y con qué criterio.",
     anclajes: {
       0: "Las alertas se ignoran o se cierran sin mirarlas",
@@ -242,6 +246,8 @@ export const DIMENSIONES = [
   {
     id: "RS.AN",
     nombre: "Análisis del incidente",
+    pregunta_sola:
+      "Del último incidente: ¿hasta dónde llegó? ¿Pudieron saber a qué más tuvo acceso, o quedó la duda?",
     mide: "Si después de un incidente se establece qué pasó realmente y hasta dónde llegó.",
     anclajes: {
       0: "No se averigua nada: se arregla y se sigue",
