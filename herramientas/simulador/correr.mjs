@@ -30,6 +30,8 @@ const { CLIENTE, ESPERADO } = await import(
 
 const MODELO = process.env.MODELO_LITELLM ?? "vertex_ai/claude-sonnet-5";
 const MAX_INTERCAMBIOS = 45;
+// Cuántas veces se puntúa cada tema sobre la misma conversación.
+const PASADAS = Number(process.env.PASADAS ?? 3);
 // Pensamiento adaptativo: si el proxy lo rechaza, se apaga solo y se sigue.
 let THINKING = { type: "adaptive" };
 // El proxy cachea respuestas sobre Redis. Para que las corridas sean
@@ -291,30 +293,6 @@ for (let i = 0; i < MAX_INTERCAMBIOS && !estado.cerrada; i++) {
       transcripto.push({ tipo: "herramienta", nombre: c.function.name, args, resultado: res });
       msgsEntrevistador.push({ role: "tool", tool_call_id: c.id, content: JSON.stringify(res) });
 
-      // Dar por cubierto un tema dispara al puntuador. El entrevistador no se
-      // entera del nivel: sólo sabe que el tema quedó resuelto.
-      if (c.function.name === "cerrar_dimension" && res.ok && !res.aviso?.includes("ya estaba")) {
-        const dim = DIMENSIONES.find((d) => d.id === args.dimension_id);
-        let puesto = null;
-        for (let intento = 0; intento < 2 && !puesto?.ok; intento++) {
-          const p = await puntuar(dim, args.por_que_alcanza, puesto?.error);
-          if (!p) break;
-          puesto = ejecutar(estado, "registrar_puntaje", {
-            ...p,
-            dimension_id: args.dimension_id,
-            rol_fuente: args.rol_fuente,
-          });
-          transcripto.push({
-            tipo: "herramienta",
-            nombre: `puntuador(${args.dimension_id})`,
-            args: p,
-            resultado: puesto,
-          });
-        }
-        if (!puesto?.ok) {
-          console.error(`⚠ El puntuador no pudo cerrar ${args.dimension_id}.`);
-        }
-      }
     }
   }
 
@@ -342,6 +320,54 @@ for (let i = 0; i < MAX_INTERCAMBIOS && !estado.cerrada; i++) {
   process.stdout.write(`\n\x1b[33mMARCELA\x1b[0m ${respuesta}\n`);
 }
 
+// ---------- Puntuación ----------
+// Se puntúa recién acá, con la conversación entera delante. Puntuar en el
+// momento del cierre hacía que un tema cerrado temprano se decidiera con mucho
+// menos material que uno cerrado al final, y el orden de cierre cambia en cada
+// corrida.
+for (const dim of DIMENSIONES) {
+  const d = estado.dimensiones.get(dim.id);
+  if (d.estado !== "cubierto") continue;
+  const { por_que_alcanza, rol_fuente } = d.pendiente_de_puntaje;
+
+  const lecturas = [];
+  for (let i = 0; i < PASADAS; i++) {
+    const p = await puntuar(dim, por_que_alcanza);
+    if (p && typeof p.nivel === "number") lecturas.push(p);
+  }
+  if (!lecturas.length) {
+    console.error(`⚠ El puntuador no devolvió nada para ${dim.id}.`);
+    continue;
+  }
+
+  const niveles = lecturas.map((p) => p.nivel);
+  const votos = new Map();
+  for (const n of niveles) votos.set(n, (votos.get(n) ?? 0) + 1);
+  const ordenados = [...votos.entries()].sort((a, b) => b[1] - a[1] || a[0] - b[0]);
+
+  let puesto = null;
+  for (const [nivel] of ordenados) {
+    const elegida = lecturas.find((p) => p.nivel === nivel);
+    puesto = ejecutar(estado, "registrar_puntaje", {
+      ...elegida,
+      dimension_id: dim.id,
+      rol_fuente,
+      lecturas: niveles,
+      acuerdo: `${votos.get(nivel)}/${niveles.length}`,
+      dispersion: Math.max(...niveles) - Math.min(...niveles),
+      promedio: Number((niveles.reduce((a, b) => a + b, 0) / niveles.length).toFixed(2)),
+    });
+    transcripto.push({
+      tipo: "herramienta",
+      nombre: `puntuador(${dim.id})`,
+      args: { ...elegida, lecturas: niveles },
+      resultado: puesto,
+    });
+    if (puesto.ok) break;
+  }
+  if (!puesto?.ok) console.error(`⚠ El puntuador no pudo cerrar ${dim.id}.`);
+}
+
 // ---------- Salida ----------
 mkdirSync(new URL("./salida/", import.meta.url), { recursive: true });
 const ruta = (n) => new URL(`./salida/${n}`, import.meta.url);
@@ -357,7 +383,7 @@ writeFileSync(ruta("transcripto.md"), md.join("\n"));
 const registros = [...estado.dimensiones.values()].map((d) => ({
   id: d.id, nombre: d.nombre, estado: d.estado, ...d.registro,
   derivacion: d.derivacion ?? null,
-  esperado: ESPERADO[d.id], evidencia: d.evidencia,
+  esperado: ESPERADO[d.id], evidencia_para_validar: d.evidencia,
 }));
 writeFileSync(ruta("registros.json"), JSON.stringify({
   registros,
@@ -392,12 +418,28 @@ console.table(registros.map((r) => ({
   tema: r.id,
   nivel: r.estado === "derivado" ? `→ ${r.derivacion.rol_que_sabe}` : (r.nivel ?? "indet."),
   esperado: r.esperado,
-  evidencia: r.estado_evidencia ?? "-",
+  lecturas: r.lecturas ? r.lecturas.join("/") : "-",
+  acuerdo: r.acuerdo ?? "-",
 })));
+const dudosos = registros.filter((r) => r.dispersion > 0);
+if (dudosos.length) {
+  console.log(
+    `El instrumento no coincidió consigo mismo en ${dudosos.length} tema(s): ` +
+      dudosos.map((r) => `${r.id} (${r.lecturas.join("/")})`).join(", "),
+  );
+  console.log("Esos son los que conviene mirar a mano antes de la devolución.");
+}
 if (estado.derivaciones.length) console.log("Derivaciones:", estado.derivaciones);
 if (estado.escalamientos.length) console.log("Escalamientos:", estado.escalamientos);
 else console.log("Escalamientos: ninguno  ← esperábamos uno (VPN del proveedor viejo)");
 console.log(`\nTokens: ${uso.entrevistador.entrada + uso.entrevistado.entrada} de entrada, ${uso.entrevistador.salida + uso.entrevistado.salida} de salida.`);
 console.log(`Costo estimado de esta corrida: USD ${total.toFixed(3)} (tarifa de lista; Vertex factura aparte)`);
 console.log("La columna 'esperado' quedó calibrada contra claude-opus-5: acá es referencia, no vara.");
+const paraValidar = registros.flatMap((r) =>
+  (r.evidencia_para_validar ?? []).map((e) => `${r.id} — ${e.que}`),
+);
+if (paraValidar.length) {
+  console.log("\nEsto se tomó por declarado. Si alguna vez se quisiera validar, habría que pedir:");
+  for (const p of paraValidar) console.log("  ·", p);
+}
 console.log("Archivos en salida/: transcripto.md, registros.json, uso.json");

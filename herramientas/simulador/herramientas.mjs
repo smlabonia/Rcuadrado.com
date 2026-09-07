@@ -173,7 +173,7 @@ export function ejecutar(estado, nombre, args = {}) {
       return {
         pendientes,
         derivados,
-        cerrados: todas.filter((d) => d.estado === "cerrado").length,
+        cerrados: todas.filter((d) => d.estado === "cerrado" || d.estado === "cubierto").length,
         derivaciones_restantes: TOPE_DERIVACIONES - estado.derivaciones.length,
       };
     }
@@ -203,8 +203,9 @@ export function ejecutar(estado, nombre, args = {}) {
       if (!args.por_que_alcanza?.trim()) {
         return err("Decí qué se estableció en la conversación que permite decidir este tema.");
       }
+      dim.estado = "cubierto";
       dim.pendiente_de_puntaje = { por_que_alcanza: args.por_que_alcanza, rol_fuente: args.rol_fuente };
-      return { ok: true, aviso: `${dim.id} queda cubierto y pasa a puntuarse.` };
+      return { ok: true, aviso: `${dim.id} queda cubierto. Se puntúa al terminar la conversación.` };
     }
 
     case "registrar_puntaje": {
@@ -237,6 +238,14 @@ export function ejecutar(estado, nombre, args = {}) {
         parafraseo: args.parafraseo,
         rol_fuente: args.rol_fuente,
         esfuerzo: args.esfuerzo,
+        // Cuánto se movió el instrumento sobre esta misma conversación.
+        // acuerdo dice cuántas lecturas coincidieron con el nivel reportado.
+        // No es una medida de que el nivel sea correcto: un nivel mal
+        // calibrado también coincide consigo mismo.
+        lecturas: args.lecturas ?? null,
+        acuerdo: args.acuerdo ?? null,
+        dispersion: args.dispersion ?? null,
+        promedio: args.promedio ?? null,
       };
       return { ok: true, cerrados: [...estado.dimensiones.values()].filter((d) => d.estado === "cerrado").length };
     }
