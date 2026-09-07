@@ -127,6 +127,77 @@ export const DIMENSIONES = [
       5: "Las pruebas se hacen aunque no haya pasado nada",
     },
   },
+  {
+    id: "PR.AA",
+    nombre: "Gestión de identidades y accesos",
+    mide: "Si se sabe quién puede entrar a cada sistema, y si eso se corta cuando la persona deja de necesitarlo.",
+    anclajes: {
+      0: "Se trabaja con usuarios compartidos y nadie sabe con certeza quién entra a qué",
+      1: "Cada uno tiene su usuario en lo principal; la baja depende de que alguien se acuerde de avisar",
+      2: "Hay una rutina conocida de alta y baja que todos siguen, sin registro ni verificación posterior",
+      3: "Alta y baja documentadas con responsable, segundo factor en lo que se expone a internet, y un repaso de quién tiene qué al menos una vez al año",
+      4: "Los accesos se revisan con periodicidad y los desvíos que aparecen se corrigen",
+      5: "El alta y la baja se disparan solas desde el legajo o el contrato",
+    },
+    nota_de_campo:
+      "Preguntá por separado por los usuarios de adentro y los de los proveedores: suelen estar en niveles distintos, y el usuario compartido de un proveedor es tema de riesgo de proveedores, no de acá.",
+  },
+  {
+    id: "PR.AT",
+    nombre: "Concientización y formación",
+    mide: "Si la gente sabe qué se espera de ella y cómo reconocer un engaño.",
+    anclajes: {
+      0: "Nunca se habló del tema con nadie",
+      1: "Se avisó de boca cuando pasó algo",
+      2: "Hubo alguna charla o un correo general, sin material propio ni registro de quién participó",
+      3: "Hay formación al ingresar y al menos una vez al año, con registro de quién asistió",
+      4: "Se mide si sirvió —simulacros, pruebas de engaño— y el contenido se ajusta con eso",
+      5: "El contenido cambia según lo que muestran los incidentes propios y las pruebas",
+    },
+  },
+  {
+    id: "PR.DS",
+    nombre: "Seguridad de los datos",
+    mide: "Si la información que importa está protegida donde está guardada y cuando sale de la empresa.",
+    anclajes: {
+      0: "No se sabe dónde están los datos importantes",
+      1: "Se sabe dónde están; la protección es la que vino por defecto y nadie la tocó",
+      2: "Hay cuidados parciales —permisos por carpeta, copias— puestos en su momento y no revisados desde entonces",
+      3: "Está definido qué información es sensible, con permisos asignados, protección de lo que sale de la empresa y respaldo probado",
+      4: "Se verifica con periodicidad que los permisos y las copias sigan siendo los correctos",
+      5: "Un dato nuevo hereda su protección sin que nadie la configure",
+    },
+  },
+  {
+    id: "PR.PS",
+    nombre: "Seguridad de las plataformas",
+    mide: "Si los equipos y sistemas se mantienen en un estado conocido y actualizado.",
+    anclajes: {
+      0: "Nadie se ocupa; se actualiza cuando algo deja de andar",
+      1: "El proveedor actualiza cuando entra por otra cosa; adentro no se sabe qué quedó afuera",
+      2: "Las actualizaciones son más o menos regulares, pero no hay lista de qué equipo quedó sin cubrir",
+      3: "Hay un procedimiento de actualización con responsable, y los equipos que no se pueden actualizar están identificados Y compensados",
+      4: "Se mide qué porcentaje quedó cubierto y cuánto tardó en aplicarse",
+      5: "Los desvíos se detectan y se corrigen sin que nadie los busque",
+    },
+    nota_de_campo:
+      "El nivel 3 pide las dos cosas: identificado y compensado. Un equipo viejo anotado en el inventario pero sin ninguna medida alrededor no alcanza para 3.",
+  },
+  {
+    id: "PR.IR",
+    nombre: "Resiliencia de la infraestructura",
+    mide: "Si lo que sostiene la operación aguanta una falla y se puede volver a levantar.",
+    anclajes: {
+      0: "Si se rompe algo se ve en el momento; no hay copias",
+      1: "Hay copias de seguridad y poco más. Nunca se probó restaurarlas",
+      2: "Hay copias y algún reemplazo previsto de palabra, sin plan escrito; la restauración se probó alguna vez suelta",
+      3: "Está escrito qué se levanta primero y en cuánto tiempo, y se probó al menos una vez en el último año",
+      4: "Se prueba con periodicidad fija y se mide el tiempo real que llevó",
+      5: "La operación tolera la caída de un componente sin que el negocio lo note",
+    },
+    nota_de_campo:
+      "Que el proveedor diga que hace respaldos no es evidencia de que se pueda restaurar. La pregunta que decide entre 1 y 2 es si alguna vez se recuperó algo de verdad.",
+  },
 ];
 
 export const dimensionPorId = (id) => DIMENSIONES.find((d) => d.id === id);

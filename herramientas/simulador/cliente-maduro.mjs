@@ -124,6 +124,39 @@ Revisiones y vulnerabilidades:
 Respaldos:
 - El proveedor hace respaldos diarios. Se probó una restauración una vez, hace
   como un año y medio, y funcionó. No hay una prueba programada.
+- No existe un documento que diga qué se levanta primero ni en cuánto tiempo.
+  Eso lo sabés porque lo buscaste para la última auditoría y no estaba.
+
+Usuarios y accesos:
+- Cada persona tiene usuario nominal en todos los sistemas, y los proveedores
+  también tienen el suyo. Eso se ordenó cuando lo pidió un cliente en auditoría.
+- Hay segundo factor en el correo desde el año pasado. En el sistema de ensayos
+  no hay, y eso te consta.
+- La baja la hace el jefe de sistemas cuando recursos humanos le avisa. Nunca se
+  hizo un repaso general de quién tiene acceso a qué: no hay revisión periódica.
+
+Capacitación:
+- Hay una inducción al ingreso que incluye un módulo de seguridad de la
+  información, y un refresco anual para todos. Queda registro de asistencia,
+  porque lo exige la certificación. Esto lo contás con seguridad.
+- El contenido no se actualiza desde 2022 y nunca se midió si sirve. No se
+  hicieron simulacros ni pruebas de correos falsos. Esto lo admitís si preguntan.
+
+Los datos:
+- En el manual de calidad está definido qué información es sensible: los
+  informes de ensayo y los datos de clientes.
+- Los permisos por carpeta los administra el jefe de sistemas. No sabés si se
+  revisan.
+- Los informes de ensayo se envían a los clientes por correo, en PDF, sin nada
+  especial. Si te preguntan por cifrado, decís que eso lo tendría que contestar
+  el jefe de sistemas.
+
+Actualizaciones y equipos:
+- El proveedor externo aplica actualizaciones, dice que mensualmente. No ves un
+  informe de eso.
+- Hay dos equipos de laboratorio con software propietario que corren un Windows
+  viejo. Están identificados en el inventario. No hay ninguna medida especial
+  alrededor de ellos: están en la red como cualquier otro.
 
 Las alertas del antivirus:
 - Hace unas dos semanas que una PC del laboratorio tira alertas del antivirus.
@@ -167,6 +200,11 @@ export const ESPERADO = {
   "ID.AM": 2, // planilla buena pero sin conciliación periódica
   "ID.RA": 2, // el proveedor hace algo y adentro no se sabe qué ni cada cuánto
   "ID.IM": 2, // circuito de acciones correctivas que no cubre seguridad
+  "PR.AA": 2, // rutina conocida de alta y baja, sin repaso periódico de quién tiene qué
+  "PR.AT": 3, // inducción y refresco anual con registro de asistencia; sin medición
+  "PR.DS": 2, // definido qué es sensible, permisos puestos, sin verificación ni protección al salir
+  "PR.PS": 2, // actualizaciones regulares; los equipos viejos identificados pero no compensados
+  "PR.IR": 2, // copias, una restauración probada suelta, sin plan escrito
   _escalamiento_esperado: "alertas de antivirus sin resolver hace dos semanas en una PC en uso",
   _derivacion_esperada: "todo el detalle técnico va al jefe de sistemas",
 };

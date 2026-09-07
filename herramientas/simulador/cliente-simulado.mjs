@@ -107,6 +107,39 @@ El incidente:
 
 Restauración de respaldos:
 - El proveedor dice que hace backup del servidor. Nunca probaron restaurar nada.
+- No hay nada escrito de qué se levanta primero si se cae todo.
+
+Usuarios y contraseñas:
+- Cada empleado tiene su usuario propio en el ERP y su casilla de correo. Los
+  crea Ariel cuando vos le avisás.
+- Las contraseñas las elige cada uno. No hay ninguna regla escrita sobre cómo
+  tienen que ser ni cada cuánto cambiarlas. Sospechás que hay gente con la misma
+  desde que entró.
+- Si te preguntan por "segundo factor" o "doble verificación", no sabés qué es.
+  Preguntás qué significa y, cuando te lo explican, decís que no, que entrás con
+  usuario y contraseña nomás.
+
+Capacitación:
+- Nunca hubo una capacitación de esto. Lo único fue la charla después del
+  phishing: "tengan cuidado con los mails raros". No hubo material, ni lista de
+  quién estuvo, ni nada por escrito.
+- A los que entraron después de eso nadie les contó nada.
+
+Los datos:
+- Lo importante son los planos y los presupuestos, que están en el servidor de
+  la oficina, y la facturación, que está en el ERP.
+- Los permisos de las carpetas del servidor los puso Ariel hace años, cuando se
+  armó. Nadie los revisó desde entonces.
+- Si te preguntan si algo está cifrado, decís que no sabés qué quiere decir eso.
+- Los presupuestos y planos salen por correo común a clientes y proveedores.
+
+Actualizaciones y equipos:
+- Las actualizaciones las hace el proveedor cuando entra por otra cosa. No hay
+  una lista de qué máquina quedó sin actualizar.
+- La PC de la CNC no se toca, ya lo dijiste. No hay nada especial alrededor de
+  ella: está en la misma red que el resto.
+- Los tres vendedores usan su propio celular y su propia notebook. La empresa no
+  les instaló nada ni les pidió nada.
 
 CÓMO CONTESTÁS
 - Frases cortas, tono coloquial rioplatense. "Y…", "mirá", "la verdad que no",
@@ -139,5 +172,10 @@ export const ESPERADO = {
   "ID.AM": 1, // tope por ficha incompleta
   "ID.RA": 1,
   "ID.IM": 1,
+  "PR.AA": 1, // usuario propio adentro, pero la baja depende de que alguien avise
+  "PR.AT": 1, // sólo el aviso de boca después del phishing
+  "PR.DS": 2, // permisos por carpeta y copias, puestos en su momento y nunca revisados
+  "PR.PS": 1, // actualiza el proveedor cuando entra por otra cosa
+  "PR.IR": 1, // hay copias y nunca se probó restaurar
   _escalamiento_esperado: "VPN activa de un proveedor que dejó de trabajar hace dos años",
 };
