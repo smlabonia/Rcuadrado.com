@@ -137,6 +137,30 @@ const proyectosCandidatos = brechaPriorizada.slice(0, 5).map((d, i) => ({
   esfuerzo: d.esfuerzo,
 }));
 
+
+// ---------- Los Tiers del marco ----------
+// CSF 2.0 define cuatro Tiers —Parcial, Informado por riesgo, Repetible,
+// Adaptativo— que caracterizan el rigor del enfoque de la organización. Son uno
+// para toda la empresa, con dos columnas: gobernanza (GOVERN) y gestión (las
+// otras cinco funciones). El marco NO define cómo derivarlos de un puntaje: la
+// equivalencia contra la escala 0-5 la define R² y el informe lo dice.
+const TIERS = [
+  { n: 1, nombre: "Parcial", hasta: 1.5 },
+  { n: 2, nombre: "Informado por riesgo", hasta: 2.5 },
+  { n: 3, nombre: "Repetible", hasta: 3.5 },
+  { n: 4, nombre: "Adaptativo", hasta: Infinity },
+];
+const tierDe = (x) => (x === null ? null : TIERS.find((t) => x < t.hasta));
+const nivelGobernanza = funciones.find((f) => f.id === "GV")?.nivel ?? null;
+const nivelGestion = promedio(
+  funciones.filter((f) => f.id !== "GV" && f.nivel !== null).map((f) => f.nivel),
+);
+const tiers = {
+  gobernanza: { nivel: nivelGobernanza, ...(tierDe(nivelGobernanza) ?? {}) },
+  gestion: { nivel: nivelGestion, ...(tierDe(nivelGestion) ?? {}) },
+  equivalencia_definida_por: "R² Tech Partner, no por el marco",
+};
+
 // ---------- Glosario ----------
 // Las siglas del informe salen del marco y no se explican solas. Va completo:
 // también los temas que no se pudieron puntuar.
@@ -195,6 +219,7 @@ const informe = {
   proyectos_candidatos: proyectosCandidatos,
   ranuras_de_proyecto: ranurasDeProyecto,
   glosario,
+  tiers,
   evidencia_para_validar: registro.registros.flatMap((r) =>
     (r.evidencia_para_validar ?? []).map((e) => ({ dimension: r.id, que: e.que, por_que: e.por_que })),
   ),

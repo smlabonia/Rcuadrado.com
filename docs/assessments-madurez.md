@@ -69,6 +69,21 @@ carátula, no el entregable.
 | 4 | Gestionado | Se mide, hay metas y alguien revisa el número |
 | 5 | Optimizado | El número se usa para cambiar la práctica. Mejora sostenida |
 
+**Sobre CSF y los Tiers, para no decirlo mal.** NIST CSF 2.0 sí trae niveles
+propios: los Tiers, cuatro —Partial, Risk Informed, Repeatable, Adaptive—, que
+según el documento «characterize the rigor of an organization's cybersecurity
+risk governance and management practices». Son **uno solo para la organización
+entera**, con dos columnas —gobernanza y gestión— y no uno por categoría. Lo que
+el marco no trae es un puntaje por cada una de las veintidós categorías: eso es
+lo que define R².
+
+Y ojo con una frase que circula: «los Tiers no son niveles de madurez» está en
+CSF 1.1, **no en 2.0**, donde la palabra *maturity* aparece tres veces y ninguna
+dice eso. Citarla como de 2.0 es citar mal.
+
+La equivalencia entre nuestra escala 0-5 y los Tiers la define R², no el marco, y
+el informe lo dice donde la usa.
+
 Los mismos cinco anclajes sirven para las cinco verticales: **¿existe? ¿está
 escrito? ¿se cumple siempre? ¿se mide? ¿se mejora?** Cada pregunta del
 assessment se responde con evidencia, no con opinión: si el entrevistado dice

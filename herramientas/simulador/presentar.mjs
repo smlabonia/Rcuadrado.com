@@ -96,10 +96,13 @@ const porPrioridad = (a, b) =>
     s.addText(String(val), { x: x + 0.25, y: 2.35, w: w - 0.5, h: 0.65, isTextBox: true, margin: 0, fontFace: F.display, fontSize: 40, color, bold: true });
     s.addText(sub, { x: x + 0.25, y: 2.95, w: w - 0.5, h: 0.28, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 10, color: C.muted });
   };
-  cifra(M, 2.6, "Nivel general", n(inf.resumen.nivel_general), `meta ${n(inf.resumen.meta_general)} · escala hasta ${inf.cliente.escala_maxima}`);
+  cifra(M, 2.6, "Nivel general", n(inf.resumen.nivel_general), `meta ${n(inf.resumen.meta_general)} de ${inf.cliente.escala_maxima}${inf.tiers?.gestion?.n ? ` · Tier ${inf.tiers.gestion.n} del marco` : ""}`);
   cifra(M + 2.75, 2.6, "Temas relevados", `${inf.alcance.puntuadas}/${inf.alcance.dimensiones}`, `${inf.alcance.derivadas} derivado(s), ${inf.alcance.indeterminadas} sin establecer`);
   cifra(M + 5.5, 2.6, "No espera", inf.acciones_inmediatas.length, "acción inmediata", C.coralText);
   cifra(M + 8.25, 2.83, "Propuestas", (txt.proyectos ?? []).length, "para el taller");
+  if (inf.tiers?.gestion?.n) {
+    s.addText(`Tier ${inf.tiers.gestion.n} del marco — ${inf.tiers.gestion.nombre}`, { x: M + 8.5, y: 2.62, w: 2.4, h: 0.26, isTextBox: true, margin: 0, fontFace: F.mono, fontSize: 8, color: C.coralText, charSpacing: 1 });
+  }
 
   // La frase de estado.
   s.addText(txt.frase_estado ?? "", { x: M, y: 3.5, w: 11.83, h: 0.85, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 15, color: C.ink, bold: true, lineSpacing: 21 });
@@ -143,7 +146,10 @@ separador(pres, lamina(), "01", "Dónde están hoy", "El resultado en una págin
   tarjeta(pres, s, 8.65, 2.0, 3.95, 1.85);
   etiqueta(s, "Nivel general", 8.95, 2.22, C.muted, 9, 3.4);
   s.addText(n(inf.resumen.nivel_general), { x: 8.95, y: 2.5, w: 2.2, h: 1.0, isTextBox: true, margin: 0, fontFace: F.display, fontSize: 68, color: C.ink, bold: true });
-  s.addText(`sobre una meta de ${n(inf.resumen.meta_general)}`, { x: 8.95, y: 3.42, w: 3.4, h: 0.3, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 13, color: C.muted });
+  s.addText(`sobre una meta de ${n(inf.resumen.meta_general)}`, { x: 8.95, y: 3.36, w: 3.4, h: 0.3, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 13, color: C.muted });
+  if (inf.tiers?.gestion?.n) {
+    etiqueta(s, `Tier ${inf.tiers.gestion.n} del marco · ${inf.tiers.gestion.nombre}`, 8.95, 3.62, C.coralText, 8, 3.4);
+  }
 
   tarjeta(pres, s, 8.65, 4.05, 3.95, 1.8);
   etiqueta(s, "Lo que no espera", 8.95, 4.27, C.coralText, 9, 3.4);
@@ -205,8 +211,11 @@ separador(pres, lamina(), "02", "Cómo se midió", "La escala, la meta y qué se
       { text: "Se organiza en seis funciones y veintidós categorías. ", options: { bold: true, color: C.ink } },
       { text: "Las funciones son las seis preguntas grandes; las categorías, los temas concretos dentro de cada una. Se relevaron las veintidós: no es una muestra.", options: { color: C.muted2, breakLine: true } },
       { text: "", options: { breakLine: true } },
-      { text: "La escala 0-5 es propia. ", options: { bold: true, color: C.ink } },
-      { text: "El marco no trae puntajes: describe prácticas. La escala la define R² para que el resultado sea comparable entre diagnósticos y entre las distintas áreas que medimos.", options: { color: C.muted2 } },
+      { text: "El marco trae sus propios niveles, los Tiers: ", options: { bold: true, color: C.ink } },
+      { text: "Parcial, Informado por riesgo, Repetible y Adaptativo. Describen qué tan riguroso es el enfoque de la organización, y son uno solo para toda la empresa, no uno por tema.", options: { color: C.muted2, breakLine: true } },
+      { text: "", options: { breakLine: true } },
+      { text: "La escala 0-5 por categoría es de R². ", options: { bold: true, color: C.ink } },
+      { text: "El marco describe resultados a lograr, no puntajes por categoría. Los 0-5 los define R² para poder decir dónde está cada uno de los veintidós temas y comparar entre diagnósticos.", options: { color: C.muted2 } },
     ],
     { x: M, y: 2.0, w: 6.4, h: 3.6, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 13, lineSpacing: 19 },
   );
