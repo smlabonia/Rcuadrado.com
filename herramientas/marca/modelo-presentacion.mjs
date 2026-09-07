@@ -56,10 +56,14 @@ function grilla(s, oscuro = false) {
 function barra(s, x, y, ancho, invertida = false, oscuro = false) {
   // Sobre fondo oscuro el segmento de tinta se pierde contra el fondo y la
   // barra se lee cortada. Se sustituye por ink-3, que mantiene la jerarquía.
+  // Cada segmento tiene que verse contra SU fondo. Sobre oscuro la tinta se
+  // pierde; sobre papel, la arena. En los dos casos la barra queda cortada y se
+  // lee como si empezara en el segundo segmento.
   const tinta = oscuro ? C.ink3 : C.ink;
+  const arena = oscuro ? C.paper2 : C.line;
   const partes = invertida
-    ? [[C.amber, 0.05], [C.coral, 0.1], [tinta, 0.25], [C.paper2, 0.6]]
-    : [[C.paper2, 0.6], [tinta, 0.25], [C.coral, 0.1], [C.amber, 0.05]];
+    ? [[C.amber, 0.05], [C.coral, 0.1], [tinta, 0.25], [arena, 0.6]]
+    : [[arena, 0.6], [tinta, 0.25], [C.coral, 0.1], [C.amber, 0.05]];
   let cx = x;
   for (const [color, prop] of partes) {
     const w = ancho * prop;
@@ -96,11 +100,26 @@ function pie(s, n) {
 // Encabezado de lámina de contenido. La banda de arena le da al encabezado una
 // zona propia: sin ella el título flota y la lámina no se lee como documento.
 function encabezado(s, seccion, titulo) {
-  s.addShape(pres.ShapeType.rect, { x: 0, y: 0, w: W, h: 1.72, fill: { color: C.paper2 } });
   etiqueta(s, seccion, M, 0.52, C.coralText, 10);
   s.addText(titulo.toUpperCase(), {
     x: M, y: 0.82, w: W - M * 2, h: 0.75, isTextBox: true, margin: 0,
     fontFace: F.display, fontSize: 40, color: C.ink, bold: true,
+  });
+  // El divisor es la barra de proporción de la marca, que es exactamente para
+  // lo que existe: separar secciones. No hace falta un fondo distinto.
+  barra(s, M, 1.62, W - M * 2);
+}
+
+// Tarjeta. El manual fija el radio en 16px para tarjetas —la excepción al 2px
+// general— que a la escala de una lámina son 0,14". El borde duro se reemplaza
+// por una sombra apenas perceptible: separa del fondo sin dibujar una caja.
+function tarjeta(s, x, y, w, h, sobreArena = false) {
+  s.addShape(pres.ShapeType.roundRect, {
+    x, y, w, h,
+    rectRadius: 0.14,
+    fill: { color: sobreArena ? C.paper : C.paper2 },
+    line: { color: sobreArena ? C.line : C.paper2, width: 1 },
+    shadow: { type: "outer", color: "8A7F74", blur: 10, offset: 2, angle: 90, opacity: 0.16 },
   });
 }
 
@@ -225,9 +244,7 @@ const nota = (s, t) => s.addNotes(t);
     const fila = Math.floor(i / 3);
     const x = M + col * 4.03;
     const y = 2.1 + fila * 2.0;
-    s.addShape(pres.ShapeType.rect, {
-      x, y, w: 3.75, h: 1.75, fill: { color: C.paper2 }, line: { color: C.line, width: 1 },
-    });
+    tarjeta(s, x, y, 3.75, 1.75);
     s.addText(n, {
       x: x + 0.3, y: y + 0.25, w: 1, h: 0.55, isTextBox: true, margin: 0,
       fontFace: F.display, fontSize: 32, color: C.coralText, bold: true,
@@ -293,25 +310,25 @@ const nota = (s, t) => s.addNotes(t);
   encabezado(s, "03 · El panorama", "Dónde está hoy");
   s.addText(
     "Este es el formato base para cualquier lámina de texto. El encabezado lleva la sección en mono arriba y el título en display debajo, siempre en mayúsculas. El cuerpo va en IBM Plex Sans a 15 puntos, alineado a la izquierda y nunca centrado.",
-    { x: M, y: 2.1, w: 5.7, h: 1.6, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 15, color: C.muted, lineSpacing: 22 },
+    { x: M, y: 2.15, w: 5.7, h: 1.6, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 15, color: C.muted, lineSpacing: 22 },
   );
   s.addText(
     "El ancho de columna está pensado para unos sesenta caracteres por línea. Más ancho que eso y el ojo se pierde al volver; más angosto, el texto se corta demasiado seguido.",
     { x: M, y: 3.6, w: 5.7, h: 1.4, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 15, color: C.muted, lineSpacing: 22 },
   );
-  s.addShape(pres.ShapeType.rect, { x: 7.05, y: 2.1, w: 5.5, h: 3.6, fill: { color: C.paper2 }, line: { color: C.line, width: 1 } });
+  tarjeta(s, 7.05, 2.15, 5.5, 3.6);
   etiqueta(s, "Bloque destacado", 7.4, 2.25, C.coralText, 9);
   s.addText("1,1", {
-    x: 7.4, y: 2.75, w: 2.5, h: 1.1, isTextBox: true, margin: 0,
+    x: 7.4, y: 2.8, w: 2.5, h: 1.1, isTextBox: true, margin: 0,
     fontFace: F.display, fontSize: 76, color: C.ink, bold: true,
   });
   s.addText("sobre una meta de 3", {
-    x: 7.4, y: 3.9, w: 4.8, h: 0.35, isTextBox: true, margin: 0,
+    x: 7.4, y: 3.95, w: 4.8, h: 0.35, isTextBox: true, margin: 0,
     fontFace: F.sans, fontSize: 15, color: C.muted,
   });
   s.addText(
     "La cifra grande va en display. Es el único lugar donde un número se lleva la lámina, y funciona porque al lado está la meta: el número solo invita a discutir el número.",
-    { x: 7.4, y: 4.4, w: 4.8, h: 1, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 12, color: C.muted, lineSpacing: 17 },
+    { x: 7.4, y: 4.45, w: 4.8, h: 1, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 12, color: C.muted, lineSpacing: 17 },
   );
   pie(s, 8);
   nota(s, "Contenido A — dos columnas, texto a la izquierda y bloque destacado a la derecha. Encabezado, pie, número de página. Es la lámina que más se repite en el informe.");
@@ -333,14 +350,14 @@ const nota = (s, t) => s.addNotes(t);
     { x: M, y: 3.8, w: 7.5, h: 1.1, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 16, color: C.muted2, lineSpacing: 24 },
   );
   const caja = (x, et, val, sub) => {
-    s.addShape(pres.ShapeType.rect, { x, y: 1.95, w: 2.1, h: 1.35, fill: { color: C.paper2 }, line: { color: C.line, width: 1 } });
+    tarjeta(s, x, 1.95, 2.1, 1.35);
     etiqueta(s, et, x + 0.22, 2.15, C.muted, 8);
     s.addText(val, { x: x + 0.22, y: 2.4, w: 1.7, h: 0.7, isTextBox: true, margin: 0, fontFace: F.display, fontSize: 42, color: C.ink, bold: true });
     s.addText(sub, { x: x + 0.22, y: 2.95, w: 1.7, h: 0.3, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 10, color: C.muted });
   };
   caja(8.55, "Hoy", "1", "de 5");
   caja(10.85, "Meta", "3", "de 5");
-  s.addShape(pres.ShapeType.rect, { x: 8.55, y: 3.55, w: 4.4, h: 1.35, fill: { color: C.paper2 }, line: { color: C.line, width: 1 } });
+  tarjeta(s, 8.55, 3.55, 4.4, 1.35);
   etiqueta(s, "Esfuerzo estimado", 8.77, 3.75, C.muted, 8);
   s.addText("MEDIO", { x: 8.77, y: 4.0, w: 4, h: 0.6, isTextBox: true, margin: 0, fontFace: F.display, fontSize: 38, color: C.amberInk, bold: true });
   pie(s, 14);
@@ -398,7 +415,7 @@ const nota = (s, t) => s.addNotes(t);
       showLegend: true, legendPos: "b", legendColor: C.muted2, legendFontFace: F.sans, legendFontSize: 11,
     },
   );
-  s.addShape(pres.ShapeType.rect, { x: 7.9, y: 1.95, w: 4.65, h: 4.15, fill: { color: C.paper2 }, line: { color: C.line, width: 1 } });
+  tarjeta(s, 7.9, 1.95, 4.65, 4.15);
   etiqueta(s, "Cómo se lee", 8.2, 2.2, C.coralText, 9);
   s.addText(
     "La estrella compara las seis funciones contra la meta. Se promedia dentro de cada función y después entre funciones: promediar los veintidós temas de una haría pesar a Gobernar el triple que a Recuperar, que tiene seis categorías contra dos.",

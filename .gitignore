@@ -1,4 +1,8 @@
 .DS_Store
 Thumbs.db
 node_modules/
-.claude/
+.claude/*
+# Los skills del proyecto sí se versionan: son conocimiento compartido que se
+# mejora con el uso. Git no desciende a un directorio ignorado, así que hay que
+# ignorar el contenido y desexcluir la carpeta, no al revés.
+!.claude/skills/
