@@ -2,25 +2,76 @@
 // simulado, y deja el transcripto, los registros y el costo en salida/.
 //
 // Es un banco de pruebas descartable. No es la plataforma.
+//
+// VARIANTE LiteLLM. Habla el protocolo compatible con OpenAI contra el proxy
+// local, que enruta a Claude por Vertex AI. Los prompts, el guion y las
+// herramientas son exactamente los mismos; lo único que cambia es el transporte.
+//
+// LO QUE CAMBIA respecto del original, y hay que tenerlo en cuenta al leer:
+//   - el modelo es claude-sonnet-5, no claude-opus-5: los ESPERADO de
+//     cliente-simulado.mjs están calibrados contra Opus 5, así que la columna
+//     "esperado" es referencia cercana, no vara exacta
+//   - no hay control de esfuerzo (effort); sí se intenta el pensamiento adaptativo
+//   - no hay puntos de caché de prompt: el sistema se reenvía entero cada vez
+//   - se pide no-cache por request: el proxy tiene cache_responses activo y si
+//     no, la segunda y la tercera corrida serían copias de la primera
 
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { writeFileSync, mkdirSync } from "node:fs";
 import { HERRAMIENTAS, crearEstado, ejecutar } from "./herramientas.mjs";
 import { DIMENSIONES } from "./guion.mjs";
-import { CLIENTE, ESPERADO } from "./cliente-simulado.mjs";
+// Dos casos: la metalúrgica chica y desordenada, y una empresa de servicios
+// bastante más ordenada. Se elige con CASO=chico|maduro.
+const CASO = process.env.CASO ?? "chico";
+const { CLIENTE, ESPERADO } = await import(
+  CASO === "maduro" ? "./cliente-maduro.mjs" : "./cliente-simulado.mjs"
+);
 
-const MODELO = "claude-opus-5";
+const MODELO = process.env.MODELO_LITELLM ?? "vertex_ai/claude-sonnet-5";
 const MAX_INTERCAMBIOS = 45;
-const PRECIO = { entrada: 5, salida: 25, escritura_cache: 6.25, lectura_cache: 0.5 }; // USD por millón
+// Pensamiento adaptativo: si el proxy lo rechaza, se apaga solo y se sigue.
+let THINKING = { type: "adaptive" };
+// El proxy cachea respuestas sobre Redis. Para que las corridas sean
+// independientes entre sí, cada request pide saltearlo.
+const SIN_CACHE = { "no-cache": true };
 
-const client = new Anthropic();
+// Tarifas de lista de Anthropic para el modelo detrás de cada alias. Vertex es
+// partner y factura por su cuenta: tomá el número como estimación, no como factura.
+const PRECIOS = {
+  "vertex_ai/claude-sonnet-5": { entrada: 2, salida: 10, escritura_cache: 2.5, lectura_cache: 0.2 },
+  "vertex_ai/claude-opus-4-7": { entrada: 5, salida: 25, escritura_cache: 6.25, lectura_cache: 0.5 },
+  "vertex_ai/claude-haiku-4-5": { entrada: 1, salida: 5, escritura_cache: 1.25, lectura_cache: 0.1 },
+};
+const PRECIO = PRECIOS[MODELO] ?? { entrada: 0, salida: 0, escritura_cache: 0, lectura_cache: 0 };
+
+const BASE = (process.env.LITELLM_BASE_URL ?? "http://localhost:4000").replace(/\/+$/, "");
+const client = new OpenAI({
+  baseURL: BASE.endsWith("/v1") ? BASE : `${BASE}/v1`,
+  apiKey: process.env.LITELLM_KEY,
+});
+
+// Único punto de entrada a la API. Si el proxy rechaza el pensamiento adaptativo,
+// lo apaga para el resto de la corrida y reintenta esa misma llamada sin él.
+async function pedir(params) {
+  try {
+    return await client.chat.completions.create(params);
+  } catch (e) {
+    if (params.thinking && e?.status === 400) {
+      console.error("⚠ El proxy rechazó thinking. Sigo sin pensamiento adaptativo.");
+      THINKING = null;
+      const { thinking, ...resto } = params;
+      return await client.chat.completions.create(resto);
+    }
+    throw e;
+  }
+}
+
 const uso = { entrevistador: vacio(), entrevistado: vacio() };
 function vacio() { return { entrada: 0, salida: 0, escritura_cache: 0, lectura_cache: 0 }; }
 function sumar(destino, u) {
-  destino.entrada += u.input_tokens ?? 0;
-  destino.salida += u.output_tokens ?? 0;
-  destino.escritura_cache += u.cache_creation_input_tokens ?? 0;
-  destino.lectura_cache += u.cache_read_input_tokens ?? 0;
+  destino.entrada += u?.prompt_tokens ?? 0;
+  destino.salida += u?.completion_tokens ?? 0;
+  destino.lectura_cache += u?.prompt_tokens_details?.cached_tokens ?? 0;
 }
 const costo = (u) =>
   (u.entrada * PRECIO.entrada + u.salida * PRECIO.salida +
@@ -43,8 +94,42 @@ La intención no cuenta: "estamos por implementarlo" describe el futuro.
 Registrá el presente y dejá la intención en el hallazgo.
 "Creo", "me parece" y "debería" piden repregunta por el hecho concreto. Si no
 aparece un hecho, es indeterminado, no un nivel bajo.
-Si te dicen que no saben, no insistas: marcalo indeterminado anotando qué rol
-sabría, y seguí.
+Si te dicen que no saben, no insistas: fijate si hay un rol que sí lo sabe y
+derivá, o marcalo indeterminado si no lo hay, y seguí.
+
+CUANDO NO ES LA PERSONA
+Que alguien no sepa algo casi nunca es un hallazgo: es que preguntaste en el
+lugar equivocado. Si te dicen que eso lo maneja otro, derivá el tema a ese rol
+en vez de puntuarlo por aproximación. Un puntaje inventado con evidencia de
+segunda mano es peor que un tema pendiente.
+La regla es dura: si la persona te nombra un rol, un área o un tercero que sabe
+—"eso lo maneja el proveedor", "preguntale al contador", "eso lo lleva calidad"—
+ese tema no se puntúa con lo que ella supone. No importa que te hayas hecho una
+idea.
+Pero derivás el dato que falta, NO la conversación. Que el detalle lo tenga otro
+no significa que esta persona no tenga nada: casi siempre se acuerda de algo que
+nadie más sabe. Preguntale igual qué recuerda, cómo lo vivió, qué pasó la última
+vez. Recién cuando se acabe lo que ella puede contar, derivás lo puntual que no
+pudo contestar.
+Nunca derives un tema que todavía no exploraste. Derivar antes de preguntar es
+perder el hallazgo.
+Antes de cerrar cualquier tema, repasá si quedó algo que apuntaba a otro rol.
+Distinto es que no haya nadie que pueda contestarlo. Eso sí es un dato, y va a
+indeterminado.
+Derivás por rol, nunca por nombre: quién es esa persona lo resuelve el
+coordinador, no vos.
+Tenés un tope de derivaciones. Cuando se agota, cerrá con lo que tengas.
+Tu conversación termina cuando no queda nada para esta persona, aunque haya
+temas esperando a otro rol. Eso no es dejar el trabajo a medias.
+
+EL REGISTRO
+Sos cordial y hablás simple, pero el registro lo ponés vos: no lo espejás.
+Nada de "che", "quilombo", "bárbaro", "laburo" ni malas palabras, aunque la
+persona las use. Copiarle el habla suena a imitación, no a cercanía.
+Del otro lado tampoco: nada de jerga técnica ni de palabras de manual.
+Frases cortas, voseo, trato llano y sobrio.
+Si repetís una expresión de la persona para mostrarle que la escuchaste, que se
+note que es de ella: entre comillas, no incorporada a tu forma de hablar.
 
 QUÉ NUNCA HACÉS
 No usás las palabras nivel, puntaje, madurez, evaluación, ni el nombre de ningún
@@ -98,11 +183,25 @@ ${Object.entries(d.anclajes).map(([n, t]) => `  ${n} = ${t}`).join("\n")}
 ${d.regla_especial ? `REGLA: ${d.regla_especial}` : ""}${d.nota_de_campo ? `NOTA: ${d.nota_de_campo}` : ""}`).join("\n")}
 `.trim();
 
+// Las tres capas van juntas en un solo mensaje de sistema: acá no hay bloques
+// ni puntos de caché.
 const sistema = [
-  { type: "text", text: CONDUCTA },
-  { type: "text", text: GUION },
-  { type: "text", text: `FICHA DE CONTEXTO DEL CLIENTE\n\n${CLIENTE.ficha}`, cache_control: { type: "ephemeral" } },
-];
+  CONDUCTA,
+  GUION,
+  `FICHA DE CONTEXTO DEL CLIENTE\n\n${CLIENTE.ficha}`,
+].join("\n\n");
+
+// Las siete herramientas, traducidas al formato de funciones. herramientas.mjs
+// no se toca: la traducción vive acá.
+const FUNCIONES = HERRAMIENTAS.map((h) => ({
+  type: "function",
+  function: {
+    name: h.name,
+    description: h.description,
+    parameters: h.input_schema,
+    strict: h.strict ?? false,
+  },
+}));
 
 // ---------- El bucle ----------
 const estado = crearEstado({
@@ -110,38 +209,45 @@ const estado = crearEstado({
   inventarioIncompleto: CLIENTE.inventarioIncompleto,
 });
 const transcripto = [];
-let msgsEntrevistador = [{ role: "user", content: "[La persona abrió el enlace y está esperando. Saludala y arrancá.]" }];
-let msgsEntrevistado = [];
-
-const textoDe = (content) => content.filter((b) => b.type === "text").map((b) => b.text).join("\n").trim();
+let msgsEntrevistador = [
+  { role: "system", content: sistema },
+  { role: "user", content: "[La persona abrió el enlace y está esperando. Saludala y arrancá.]" },
+];
+let msgsEntrevistado = [{ role: "system", content: CLIENTE.persona }];
 
 for (let i = 0; i < MAX_INTERCAMBIOS && !estado.cerrada; i++) {
   // --- turno del entrevistador: puede llamar herramientas varias veces ---
   let dicho = [];
   for (let paso = 0; paso < 12; paso++) {
-    const r = await client.messages.create({
+    const r = await pedir({
       model: MODELO,
       max_tokens: 8000,
-      system: sistema,
       messages: msgsEntrevistador,
-      tools: HERRAMIENTAS,
-      thinking: { type: "adaptive" },
-      output_config: { effort: "high" },
+      tools: FUNCIONES,
+      ...(THINKING ? { thinking: THINKING } : {}),
+      cache: SIN_CACHE,
     });
     sumar(uso.entrevistador, r.usage);
-    const t = textoDe(r.content);
+    const m = r.choices[0].message;
+    const t = (m.content ?? "").trim();
     if (t) dicho.push(t);
-    msgsEntrevistador.push({ role: "assistant", content: r.content });
+    msgsEntrevistador.push(m);
 
-    if (r.stop_reason !== "tool_use") break;
+    const llamadas = m.tool_calls ?? [];
+    if (!llamadas.length) break;
 
-    const llamadas = r.content.filter((b) => b.type === "tool_use");
-    const resultados = llamadas.map((c) => {
-      const res = ejecutar(estado, c.name, c.input ?? {});
-      transcripto.push({ tipo: "herramienta", nombre: c.name, args: c.input, resultado: res });
-      return { type: "tool_result", tool_use_id: c.id, content: JSON.stringify(res), is_error: !!res.error };
-    });
-    msgsEntrevistador.push({ role: "user", content: resultados });
+    // Cada resultado va en su propio mensaje, atado por tool_call_id.
+    for (const c of llamadas) {
+      let args = {};
+      try {
+        args = JSON.parse(c.function.arguments || "{}");
+      } catch {
+        args = { _sin_parsear: c.function.arguments };
+      }
+      const res = ejecutar(estado, c.function.name, args);
+      transcripto.push({ tipo: "herramienta", nombre: c.function.name, args, resultado: res });
+      msgsEntrevistador.push({ role: "tool", tool_call_id: c.id, content: JSON.stringify(res) });
+    }
   }
 
   const mensaje = dicho.join("\n\n").trim();
@@ -154,16 +260,15 @@ for (let i = 0; i < MAX_INTERCAMBIOS && !estado.cerrada; i++) {
 
   // --- turno del entrevistado ---
   msgsEntrevistado.push({ role: "user", content: mensaje });
-  const r2 = await client.messages.create({
+  const r2 = await pedir({
     model: MODELO,
     max_tokens: 2000,
-    system: [{ type: "text", text: CLIENTE.persona, cache_control: { type: "ephemeral" } }],
     messages: msgsEntrevistado,
-    output_config: { effort: "low" },
+    cache: SIN_CACHE,
   });
   sumar(uso.entrevistado, r2.usage);
-  const respuesta = textoDe(r2.content);
-  msgsEntrevistado.push({ role: "assistant", content: r2.content });
+  const respuesta = (r2.choices[0].message.content ?? "").trim();
+  msgsEntrevistado.push({ role: "assistant", content: respuesta });
   msgsEntrevistador.push({ role: "user", content: respuesta });
   transcripto.push({ tipo: "persona", texto: respuesta });
   process.stdout.write(`\n\x1b[33mMARCELA\x1b[0m ${respuesta}\n`);
@@ -183,17 +288,48 @@ writeFileSync(ruta("transcripto.md"), md.join("\n"));
 
 const registros = [...estado.dimensiones.values()].map((d) => ({
   id: d.id, nombre: d.nombre, estado: d.estado, ...d.registro,
+  derivacion: d.derivacion ?? null,
   esperado: ESPERADO[d.id], evidencia: d.evidencia,
 }));
-writeFileSync(ruta("registros.json"), JSON.stringify({ registros, escalamientos: estado.escalamientos, cerrada: estado.cerrada }, null, 2));
+writeFileSync(ruta("registros.json"), JSON.stringify({
+  registros,
+  escalamientos: estado.escalamientos,
+  derivaciones: estado.derivaciones,
+  participacion_cerrada: estado.cerrada,
+  evaluacion_completa: estado.cerrada && estado.derivaciones.length === 0,
+}, null, 2));
 
 const total = costo(uso.entrevistador) + costo(uso.entrevistado);
-writeFileSync(ruta("uso.json"), JSON.stringify({ uso, costo_usd: { entrevistador: costo(uso.entrevistador), entrevistado: costo(uso.entrevistado), total } }, null, 2));
+writeFileSync(ruta("uso.json"), JSON.stringify({
+  modelo: MODELO,
+  caso: CASO,
+  empresa: CLIENTE.empresa,
+  pensamiento_adaptativo: THINKING ? "sí" : "no (el proxy lo rechazó)",
+  nota: "Vía proxy LiteLLM a Vertex AI. El costo usa tarifas de lista de Anthropic; Vertex factura por su cuenta, así que es estimación.",
+  uso,
+  costo_usd: { entrevistador: costo(uso.entrevistador), entrevistado: costo(uso.entrevistado), total },
+}, null, 2));
 
 console.log("\n\n─────────────── RESULTADO ───────────────");
+console.log(`Modelo: ${MODELO} · caso: ${CASO} (${CLIENTE.empresa})`);
 console.log(`Participación cerrada: ${estado.cerrada ? "sí" : "NO — se agotaron los intercambios"}`);
-console.table(registros.map((r) => ({ tema: r.id, nivel: r.nivel ?? "indet.", esperado: r.esperado, evidencia: r.estado_evidencia ?? "-" })));
+console.log(
+  `Evaluación completa: ${
+    estado.cerrada && !estado.derivaciones.length
+      ? "sí"
+      : `no — ${estado.derivaciones.length} tema(s) esperando a otro rol`
+  }`,
+);
+console.table(registros.map((r) => ({
+  tema: r.id,
+  nivel: r.estado === "derivado" ? `→ ${r.derivacion.rol_que_sabe}` : (r.nivel ?? "indet."),
+  esperado: r.esperado,
+  evidencia: r.estado_evidencia ?? "-",
+})));
+if (estado.derivaciones.length) console.log("Derivaciones:", estado.derivaciones);
 if (estado.escalamientos.length) console.log("Escalamientos:", estado.escalamientos);
 else console.log("Escalamientos: ninguno  ← esperábamos uno (VPN del proveedor viejo)");
-console.log(`\nCosto de esta corrida: USD ${total.toFixed(3)}`);
+console.log(`\nTokens: ${uso.entrevistador.entrada + uso.entrevistado.entrada} de entrada, ${uso.entrevistador.salida + uso.entrevistado.salida} de salida.`);
+console.log(`Costo estimado de esta corrida: USD ${total.toFixed(3)} (tarifa de lista; Vertex factura aparte)`);
+console.log("La columna 'esperado' quedó calibrada contra claude-opus-5: acá es referencia, no vara.");
 console.log("Archivos en salida/: transcripto.md, registros.json, uso.json");

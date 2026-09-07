@@ -119,13 +119,33 @@ export const HERRAMIENTAS = [
     strict: true,
   },
   {
+    name: "derivar",
+    description:
+      "Marca un tema como pendiente de otro rol: esta persona no es quien lo sabe. Es distinto de marcar_indeterminado, que es para cuando no hay nadie que pueda contestarlo. Usalo cuando te derivan a alguien concreto, en vez de puntuar por aproximación. Hay un tope por participación.",
+    input_schema: {
+      type: "object",
+      properties: {
+        dimension_id: { type: "string" },
+        rol_que_sabe: { type: "string", description: "El rol que podría contestarlo, nunca el nombre" },
+        que_falta: { type: "string", description: "Qué habría que averiguar con ese rol" },
+      },
+      required: ["dimension_id", "rol_que_sabe", "que_falta"],
+      additionalProperties: false,
+    },
+    strict: true,
+  },
+  {
     name: "cerrar_participacion",
     description:
-      "Termina la conversación. Sólo funciona si no queda ningún tema abierto. Si falla, seguí preguntando por lo que falte.",
+      "Termina la conversación de esta persona. Funciona si no queda ningún tema abierto ni sin tocar; los temas derivados a otro rol no lo impiden, porque no son de ella. Si falla, seguí preguntando por lo que falte.",
     input_schema: esquemaVacio,
     strict: true,
   },
 ];
+
+// Tope de derivaciones por participación. Sin esto, cada "no sé" genera un
+// pedido a otra persona y una charla se convierte en un proyecto.
+export const TOPE_DERIVACIONES = 3;
 
 export function crearEstado({ nombresPropios = [], inventarioIncompleto = false } = {}) {
   const dimensiones = new Map(
@@ -134,17 +154,24 @@ export function crearEstado({ nombresPropios = [], inventarioIncompleto = false 
       { id: d.id, nombre: d.nombre, estado: "sin_tocar", observaciones: [], evidencia: [], registro: null },
     ]),
   );
-  return { dimensiones, escalamientos: [], cerrada: false, nombresPropios, inventarioIncompleto };
+  return {
+    dimensiones,
+    escalamientos: [],
+    derivaciones: [],
+    cerrada: false,
+    nombresPropios,
+    inventarioIncompleto,
+  };
 }
 
 const err = (mensaje) => ({ error: mensaje });
 
-function validarRol(estado, rol) {
+function validarRol(estado, rol, campo = "rol_fuente") {
   const encontrado = estado.nombresPropios.find((n) =>
     rol.toLowerCase().includes(n.toLowerCase()),
   );
   return encontrado
-    ? err(`El campo rol_fuente contiene un nombre propio ("${encontrado}"). Usá el rol.`)
+    ? err(`El campo ${campo} contiene un nombre propio ("${encontrado}"). Usá el rol.`)
     : null;
 }
 
@@ -156,10 +183,20 @@ export function ejecutar(estado, nombre, args = {}) {
 
   switch (nombre) {
     case "consultar_pendientes": {
-      const pendientes = [...estado.dimensiones.values()]
-        .filter((d) => d.estado !== "cerrado")
+      const todas = [...estado.dimensiones.values()];
+      // Pendientes = lo que le falta a ESTA persona. Lo derivado ya no es suyo.
+      const pendientes = todas
+        .filter((d) => d.estado === "sin_tocar" || d.estado === "abierto")
         .map((d) => ({ id: d.id, nombre: d.nombre, estado: d.estado }));
-      return { pendientes, cerrados: [...estado.dimensiones.values()].filter((d) => d.estado === "cerrado").length };
+      const derivados = todas
+        .filter((d) => d.estado === "derivado")
+        .map((d) => ({ id: d.id, nombre: d.nombre, rol_que_sabe: d.derivacion.rol_que_sabe }));
+      return {
+        pendientes,
+        derivados,
+        cerrados: todas.filter((d) => d.estado === "cerrado").length,
+        derivaciones_restantes: TOPE_DERIVACIONES - estado.derivaciones.length,
+      };
     }
 
     case "registrar_observacion": {
@@ -191,6 +228,13 @@ export function ejecutar(estado, nombre, args = {}) {
         );
       }
       dim.estado = "cerrado";
+      // Si el tema venía derivado y ahora alcanzó para puntuarlo, la derivación
+      // no se cae: pasa a ser parcial. El nivel queda, el hueco sigue viajando.
+      if (dim.derivacion && !dim.derivacion.parcial) {
+        dim.derivacion.parcial = true;
+        const registrada = estado.derivaciones.find((d) => d.dimension_id === dim.id);
+        if (registrada) registrada.parcial = true;
+      }
       dim.registro = {
         nivel: args.nivel,
         estado_evidencia: dim.evidencia.some((e) => e.recibida) ? "respaldado" : "declarado",
@@ -217,22 +261,55 @@ export function ejecutar(estado, nombre, args = {}) {
       return { ok: true };
     }
 
+    case "derivar": {
+      if (dim.estado === "derivado") return { ok: true, aviso: `${dim.id} ya estaba derivado. No se duplicó.` };
+      const malRol = validarRol(estado, args.rol_que_sabe, "rol_que_sabe");
+      if (malRol) return malRol;
+      if (estado.derivaciones.length >= TOPE_DERIVACIONES) {
+        return err(
+          `Se agotaron las ${TOPE_DERIVACIONES} derivaciones de esta participación. Cerrá ${dim.id} con lo que tengas, o marcalo indeterminado si no hay nada.`,
+        );
+      }
+      // Un tema ya puntuado puede tener un punto que lo sabe otro rol. Eso se
+      // anota como derivación parcial: el nivel queda, el hueco viaja.
+      const parcial = dim.estado === "cerrado";
+      dim.derivacion = { rol_que_sabe: args.rol_que_sabe, que_falta: args.que_falta, parcial };
+      if (!parcial) dim.estado = "derivado";
+      estado.derivaciones.push({ dimension_id: dim.id, ...dim.derivacion });
+      return {
+        ok: true,
+        parcial,
+        derivaciones_restantes: TOPE_DERIVACIONES - estado.derivaciones.length,
+        aviso: parcial
+          ? `${dim.id} conserva su nivel; el punto que falta queda pendiente del otro rol.`
+          : "El tema queda pendiente de otra participación. No bloquea el cierre de esta conversación.",
+      };
+    }
+
     case "escalar": {
       estado.escalamientos.push({ motivo: args.motivo, urgencia: args.urgencia });
       return { ok: true, aviso: "Registrado para atención humana inmediata." };
     }
 
     case "cerrar_participacion": {
-      const abiertos = [...estado.dimensiones.values()].filter((d) => d.estado !== "cerrado");
+      // Lo derivado no bloquea: no es de esta persona. Cierra la conversación,
+      // no la evaluación, que sigue incompleta hasta que se resuelvan.
+      const abiertos = [...estado.dimensiones.values()].filter(
+        (d) => d.estado === "sin_tocar" || d.estado === "abierto",
+      );
       if (abiertos.length) {
         return err(
           `No podés cerrar todavía: quedan ${abiertos.length} tema(s) sin resolver — ${abiertos
             .map((d) => `${d.id} (${d.nombre})`)
-            .join(", ")}. Cerralos o marcalos indeterminados.`,
+            .join(", ")}. Cerralos, derivalos al rol que sepa, o marcalos indeterminados.`,
         );
       }
       estado.cerrada = true;
-      return { ok: true };
+      return {
+        ok: true,
+        evaluacion_completa: estado.derivaciones.length === 0,
+        derivaciones_pendientes: estado.derivaciones.length,
+      };
     }
 
     default:

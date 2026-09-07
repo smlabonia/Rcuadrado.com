@@ -8,6 +8,7 @@
     "correr": "node correr.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.124.0"
+    "@anthropic-ai/sdk": "^0.124.0",
+    "openai": "^7.10.0"
   }
 }
