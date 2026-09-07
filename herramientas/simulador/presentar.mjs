@@ -411,22 +411,53 @@ if (inf.acciones_inmediatas.length) {
   s.addNotes("El cuadrante destacado —alto impacto, bajo esfuerzo— es por donde conviene arrancar. La matriz ordena la discusión sin que nadie tenga que defender un orden.");
 }
 
-// El detalle de las propuestas mejor ubicadas.
+// Lo que más rinde: el cuadrante de bajo esfuerzo y alto impacto. Va solo,
+// porque es la lámina sobre la que se decide en la reunión.
 {
+  const rinde = (txt.proyectos ?? []).filter((p) => p.esfuerzo === "bajo" && p.impacto === "alto");
   const s = lamina();
   s.background = { color: C.paper };
-  encabezado(pres, s, "05 · Qué sigue", "Las cuatro primeras");
-  s.addText("Ordenadas por impacto y esfuerzo. El resto está en el informe escrito, agrupado por tema.", { x: M, y: 1.95, w: 11.5, h: 0.35, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 13, color: C.muted });
-  [...(txt.proyectos ?? [])].sort(porPrioridad).slice(0, 4).forEach((pr, i) => {
+  encabezado(pres, s, "05 · Qué sigue", "Lo que más rinde");
+  s.addText(
+    rinde.length
+      ? `${rinde.length} propuestas de bajo esfuerzo y alto impacto. Se resuelven con la gente que ya está y en días, no en meses. Si sólo se hiciera esto, la foto cambia.`
+      : "Ninguna propuesta quedó en bajo esfuerzo y alto impacto: todo lo que mueve la aguja acá pide tiempo o plata.",
+    { x: M, y: 1.95, w: 11.8, h: 0.4, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 13, color: C.muted },
+  );
+  rinde.slice(0, 6).forEach((pr, i) => {
     const x = M + (i % 2) * 6.15;
-    const y = 2.5 + Math.floor(i / 2) * 2.02;
+    const y = 2.5 + Math.floor(i / 2) * 1.42;
     const dim = inf.dimensiones.find((d) => d.id === pr.dimension);
-    tarjeta(pres, s, x, y, 5.85, 1.88);
-    s.addText(String(i + 1), { x: x + 0.3, y: y + 0.22, w: 0.5, h: 0.45, isTextBox: true, margin: 0, fontFace: F.display, fontSize: 28, color: C.coralText, bold: true });
-    s.addText(pr.nombre, { x: x + 0.85, y: y + 0.25, w: 4.7, h: 0.35, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 14, color: C.ink, bold: true });
-    s.addText(`${pr.dimension} ${dim?.nombre ?? ""} · esfuerzo ${pr.esfuerzo} · impacto ${pr.impacto}`, { x: x + 0.85, y: y + 0.63, w: 4.7, h: 0.26, isTextBox: true, margin: 0, fontFace: F.mono, fontSize: 8.5, color: C.muted, charSpacing: 1 });
-    const d = pr.descripcion ?? "";
-    s.addText(d.length > 190 ? d.slice(0, d.lastIndexOf(" ", 190)) + "…" : d, { x: x + 0.85, y: y + 0.97, w: 4.7, h: 0.8, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 10.5, color: C.muted, lineSpacing: 14 });
+    tarjeta(pres, s, x, y, 5.85, 1.28);
+    s.addText(String(i + 1), { x: x + 0.28, y: y + 0.2, w: 0.45, h: 0.4, isTextBox: true, margin: 0, fontFace: F.display, fontSize: 26, color: C.coralText, bold: true });
+    s.addText(pr.nombre, { x: x + 0.8, y: y + 0.22, w: 4.8, h: 0.32, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 13.5, color: C.ink, bold: true });
+    s.addText(`${pr.dimension} ${dim?.nombre ?? ""}`, { x: x + 0.8, y: y + 0.57, w: 4.8, h: 0.24, isTextBox: true, margin: 0, fontFace: F.mono, fontSize: 8.5, color: C.muted, charSpacing: 1 });
+    const d = (pr.descripcion ?? "").split(". ")[0] + ".";
+    s.addText(d.length > 140 ? d.slice(0, d.lastIndexOf(" ", 140)) + "…" : d, { x: x + 0.8, y: y + 0.84, w: 4.8, h: 0.36, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 10, color: C.muted, lineSpacing: 13 });
+  });
+  conPie(s);
+  s.addNotes("Es la lámina de la decisión. Nada de acá necesita presupuesto ni un tercero.");
+}
+
+// El resto de las iniciativas, para que quede a la vista que hay más y de qué
+// tamaño es cada una.
+{
+  const resto = [...(txt.proyectos ?? [])]
+    .filter((p) => !(p.esfuerzo === "bajo" && p.impacto === "alto"))
+    .sort(porPrioridad);
+  const s = lamina();
+  s.background = { color: C.paper };
+  encabezado(pres, s, "05 · Qué sigue", "El resto de las iniciativas");
+  s.addText(`Las otras ${resto.length}, ordenadas por impacto y esfuerzo. El detalle de cada una está en el informe escrito.`, { x: M, y: 1.95, w: 11.8, h: 0.35, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 13, color: C.muted });
+  const porColumna = Math.ceil(Math.min(resto.length, 26) / 2);
+  resto.slice(0, 26).forEach((pr, i) => {
+    const col = Math.floor(i / porColumna);
+    const fila = i % porColumna;
+    const x = M + col * 6.15;
+    const y = 2.42 + fila * 0.325;
+    s.addText(pr.nombre, { x, y, w: 3.8, h: 0.28, isTextBox: true, margin: 0, fontFace: F.sans, fontSize: 10.5, color: C.muted2 });
+    s.addText(pr.dimension, { x: x + 3.9, y: y + 0.01, w: 0.72, h: 0.26, isTextBox: true, margin: 0, fontFace: F.mono, fontSize: 8.5, color: C.coralText, charSpacing: 1 });
+    s.addText(`${pr.esfuerzo}/${pr.impacto}`, { x: x + 4.65, y: y + 0.01, w: 1.15, h: 0.26, isTextBox: true, margin: 0, fontFace: F.mono, fontSize: 8.5, color: C.muted, align: "right" });
   });
   conPie(s);
 }
