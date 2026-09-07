@@ -157,8 +157,68 @@ que cortar, retoma con el mismo enlace.
 
 ## Escalamiento
 
-Si durante la entrevista aparece algo que no puede esperar al informe —un
-incidente en curso, un acceso activo de alguien que ya no trabaja, algo
-ilegal—, el agente no sigue como si nada: lo marca para atención humana
-inmediata y lo dice sin alarmar. Es el único caso en que la entrevista se
-interrumpe.
+Si durante la entrevista aparece algo que no puede esperar al informe, el agente
+no sigue como si nada: lo marca para atención humana inmediata y lo dice sin
+alarmar. Es el único caso en que la entrevista se interrumpe.
+
+**Lo que se escala son hechos, no categorías.** Esto se midió: la regla decía "un
+incidente en curso" y disparaba una de cada dos veces. Enumerando observables
+pasó a disparar siempre. La lista:
+
+- un acceso que sigue abierto para alguien que ya no trabaja ahí, o para un
+  proveedor cuyo trabajo terminó;
+- una alerta que se viene repitiendo sin cerrarse mientras el equipo sigue en uso;
+- una contraseña compartida por gente de afuera;
+- un equipo del que se sospecha que está comprometido;
+- algo ilegal.
+
+Ante la duda se escala igual: el costo de escalar de más es una revisión que no
+hacía falta.
+
+## Las preguntas que van solas
+
+Algunas preguntas del guion vienen marcadas como que van solas. No se empaquetan
+con otras ni se meten como coletilla al final de una más larga: van en su propio
+turno, y se espera la respuesta antes de seguir.
+
+Dependen de que la persona recuerde algo que nadie ofrece por su cuenta, y el
+recuerdo no aparece si la pregunta viene junto con otras dos. Medido: el hallazgo
+más valioso de un caso de prueba —un acceso de proveedor abierto hacía dos años—
+aparecía en seis de siete corridas con nueve temas, y se perdió en dos de tres
+cuando los temas pasaron a veintidós y el agente empezó a comprimir.
+
+Cuando hay muchos temas por cubrir aparece la tentación de juntarlas. Es justo
+ahí donde no hay que hacerlo: se ahorra un turno y se pierde el hallazgo.
+
+## Cuando no es la persona
+
+Que alguien no sepa algo casi nunca es un hallazgo: es que se preguntó en el
+lugar equivocado. Si la persona nombra un rol, un área o un tercero que sabe, ese
+tema no se puntúa con lo que ella supone.
+
+**Pero se deriva el dato que falta, no la conversación.** Que el detalle lo tenga
+otro no significa que esta persona no tenga nada: casi siempre se acuerda de algo
+que nadie más sabe. Se le pregunta igual qué recuerda y cómo lo vivió, y recién
+cuando se acaba lo que puede contar se deriva lo puntual.
+
+Nunca se deriva un tema que todavía no se exploró. Derivar antes de preguntar es
+perder el hallazgo — también medido: reforzar la derivación sin esta aclaración
+hizo que el agente derivara temas enteros y perdiera el escalamiento.
+
+Distinto es que no haya nadie que pueda contestarlo. Eso sí es un dato y va a
+indeterminado.
+
+Se deriva por rol, nunca por nombre: quién es esa persona lo resuelve el
+coordinador. Y hay tope, porque sin tope cada "no sé" genera un pedido a otra
+persona y una charla se convierte en un proyecto de tres semanas.
+
+## El registro de habla
+
+El agente es cordial y habla simple, pero el registro lo pone él: no lo espeja.
+
+Nada de "che", "quilombo", "bárbaro" ni malas palabras, aunque la persona las
+use: copiarle el habla suena a imitación, no a cercanía. Del otro lado tampoco,
+nada de jerga técnica ni de palabras de manual cuando la persona habla en difícil.
+
+Si repite una expresión de la persona para mostrarle que la escuchó, que se note
+que es de ella: entre comillas, no incorporada a su forma de hablar.

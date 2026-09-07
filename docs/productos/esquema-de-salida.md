@@ -172,6 +172,40 @@ La cita no se entrega: en una empresa chica se sabe quién la dijo y el contenid
 lo expone. El informe muestra el parafraseo y el hallazgo, escritos sobre la
 práctica y no sobre la persona.
 
+## Lo que se agregó al construir ciberseguridad
+
+Campos que no estaban previstos y que salieron de correr el banco de pruebas.
+
+**En el hallazgo, sobre la puntuación.** Cada tema se puntúa tres veces sobre la
+misma conversación, porque uno de cada cinco cambia de nivel entre lecturas.
+
+| Campo | Qué guarda |
+|---|---|
+| `lecturas` | Los tres niveles crudos, ej. `[2,1,2]` |
+| `acuerdo` | Cuántas coincidieron con el reportado, ej. `"2/3"` |
+| `dispersion` | Máximo menos mínimo |
+| `promedio` | Para gráficos agregados, no para el hallazgo |
+
+El nivel reportado es **el más votado, no el promedio**: los niveles son anclajes
+con texto y un 1,67 no se puede respaldar con ninguna cita. Y `acuerdo` describe
+consistencia, no acierto: un nivel mal calibrado también coincide consigo mismo.
+
+**Estado `derivado`.** Un tema puede quedar pendiente de otro rol sin estar ni
+abierto ni cerrado. No bloquea el cierre de la participación de esa persona, pero
+sí el de la evaluación. Lleva `rol_que_sabe` y `que_falta`. Una derivación sobre
+un tema ya puntuado queda como **parcial**: el nivel se conserva y el hueco viaja.
+
+**`evidencia_para_validar`.** Lo que se pidió ver y no se verificó. El assessment
+toma lo declarado como válido; esta lista es para la conversación posterior con
+el cliente sobre qué se le creyó bajo palabra, no un candado.
+
+**`tiers`.** La equivalencia contra los Tiers del marco, cuando el estándar de la
+vertical los tenga. El registro deja explícito que la equivalencia la define R² y
+no el marco.
+
+**`meta` por dimensión.** La posición deseada, acordada antes de entrevistar. La
+brecha es contra la meta; los gráficos muestran además la escala completa.
+
 ## Pendiente
 
 - Los `dimension_id` reales salen del guion, que todavía no está escrito.
