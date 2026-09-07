@@ -252,6 +252,14 @@ pierde al tomar todo por declarado, sin convertir el producto en una auditoría.
 Cada vertical va a tener su equivalente: en digitalización de procesos serán las
 integraciones que no existen, en datos las tablas sin dueño.
 
+**Esto está resuelto como decisión de arquitectura en `dos-instrumentos.md`:**
+cada vertical tiene dos productos, uno de madurez de procesos y uno de
+cumplimiento técnico. De ahí sale una regla que aplica al escribir los anclajes
+de cualquier vertical: **un anclaje de madurez no debe exigir un control
+concreto.** Si lo hace, la ausencia del control topea el nivel sin que el informe
+lo diga, y el cliente recibe un 2 sin saber por qué no es un 3. El anclaje habla
+de la práctica; el control vive en el otro instrumento.
+
 ## Cuándo dar una vertical por lista
 
 - Las trampas de las dos fichas disparan de forma reproducible.
