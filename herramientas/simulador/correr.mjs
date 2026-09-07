@@ -20,6 +20,7 @@ import OpenAI from "openai";
 import { writeFileSync, mkdirSync } from "node:fs";
 import { HERRAMIENTAS, crearEstado, ejecutar } from "./herramientas.mjs";
 import { DIMENSIONES } from "./guion.mjs";
+import { puntuar as puntuarConModelo } from "./puntuador.mjs";
 // Dos casos: la metalúrgica chica y desordenada, y una empresa de servicios
 // bastante más ordenada. Se elige con CASO=chico|maduro.
 const CASO = process.env.CASO ?? "chico";
@@ -81,7 +82,7 @@ const paraElHistorial = (m) => ({
   ...(m.tool_calls?.length ? { tool_calls: m.tool_calls } : {}),
 });
 
-const uso = { entrevistador: vacio(), entrevistado: vacio() };
+const uso = { entrevistador: vacio(), entrevistado: vacio(), puntuador: vacio() };
 function vacio() { return { entrada: 0, salida: 0, escritura_cache: 0, lectura_cache: 0 }; }
 function sumar(destino, u) {
   destino.entrada += u?.prompt_tokens ?? 0;
@@ -223,6 +224,28 @@ const FUNCIONES = HERRAMIENTAS.map((h) => ({
   },
 }));
 
+// ---------- El puntuador ----------
+// Vive en puntuador.mjs para poder correrlo sobre un transcripto guardado.
+const conversacionHastaAhora = () =>
+  transcripto
+    .filter((e) => e.tipo === "agente" || e.tipo === "persona")
+    .map((e) => `${e.tipo === "agente" ? "ENTREVISTADOR" : "PERSONA"}: ${e.texto}`)
+    .join("\n\n");
+
+async function puntuar(dim, porQueAlcanza, aviso) {
+  const { puntaje, usage } = await puntuarConModelo({
+    pedir,
+    modelo: MODELO,
+    extra: { cache: SIN_CACHE },
+    dim,
+    conversacion: conversacionHastaAhora(),
+    porQueAlcanza,
+    aviso,
+  });
+  sumar(uso.puntuador, usage);
+  return puntaje;
+}
+
 // ---------- El bucle ----------
 const estado = crearEstado({
   nombresPropios: CLIENTE.nombresPropios,
@@ -267,6 +290,31 @@ for (let i = 0; i < MAX_INTERCAMBIOS && !estado.cerrada; i++) {
       const res = ejecutar(estado, c.function.name, args);
       transcripto.push({ tipo: "herramienta", nombre: c.function.name, args, resultado: res });
       msgsEntrevistador.push({ role: "tool", tool_call_id: c.id, content: JSON.stringify(res) });
+
+      // Dar por cubierto un tema dispara al puntuador. El entrevistador no se
+      // entera del nivel: sólo sabe que el tema quedó resuelto.
+      if (c.function.name === "cerrar_dimension" && res.ok && !res.aviso?.includes("ya estaba")) {
+        const dim = DIMENSIONES.find((d) => d.id === args.dimension_id);
+        let puesto = null;
+        for (let intento = 0; intento < 2 && !puesto?.ok; intento++) {
+          const p = await puntuar(dim, args.por_que_alcanza, puesto?.error);
+          if (!p) break;
+          puesto = ejecutar(estado, "registrar_puntaje", {
+            ...p,
+            dimension_id: args.dimension_id,
+            rol_fuente: args.rol_fuente,
+          });
+          transcripto.push({
+            tipo: "herramienta",
+            nombre: `puntuador(${args.dimension_id})`,
+            args: p,
+            resultado: puesto,
+          });
+        }
+        if (!puesto?.ok) {
+          console.error(`⚠ El puntuador no pudo cerrar ${args.dimension_id}.`);
+        }
+      }
     }
   }
 

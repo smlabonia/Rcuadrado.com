@@ -50,39 +50,18 @@ export const HERRAMIENTAS = [
   {
     name: "cerrar_dimension",
     description:
-      "Puntúa y cierra un tema. Usalo recién cuando tengas lo suficiente, con los anclajes delante. Requiere la cita literal que respalda el puntaje.",
+      "Da por cubierto un tema y lo manda a puntuar. Vos no ponés el nivel: eso lo hace otro paso, con los anclajes de ese tema delante y la conversación completa. Usalo cuando ya preguntaste lo suficiente como para que alguien pueda decidir con hechos.",
     input_schema: {
       type: "object",
       properties: {
         dimension_id: { type: "string" },
-        nivel: { type: "integer", minimum: 0, maximum: 5 },
-        hallazgo: {
+        por_que_alcanza: {
           type: "string",
-          description: "Sobre la práctica, nunca sobre la persona. Sin adjetivos de catástrofe.",
+          description: "Qué se estableció en la conversación que permite decidir este tema",
         },
-        cita_textual: { type: "string", description: "La frase literal que respalda el nivel" },
-        cita_entregable: {
-          type: "boolean",
-          description:
-            "Falso si se puede deducir quién lo dijo, o si el contenido perjudica a quien lo dijo.",
-        },
-        parafraseo: {
-          type: "string",
-          description: "Versión no atribuible. Obligatorio si cita_entregable es falso.",
-        },
-        rol_fuente: { type: "string" },
-        esfuerzo: { type: "string", enum: ["bajo", "medio", "alto"] },
+        rol_fuente: { type: "string", description: "El rol, nunca el nombre" },
       },
-      required: [
-        "dimension_id",
-        "nivel",
-        "hallazgo",
-        "cita_textual",
-        "cita_entregable",
-        "parafraseo",
-        "rol_fuente",
-        "esfuerzo",
-      ],
+      required: ["dimension_id", "por_que_alcanza", "rol_fuente"],
       additionalProperties: false,
     },
     strict: true,
@@ -214,7 +193,21 @@ export function ejecutar(estado, nombre, args = {}) {
       return { ok: true };
     }
 
+    // El entrevistador sólo declara que el tema está cubierto. El nivel lo pone
+    // registrar_puntaje, que no es una herramienta del modelo: la llama el
+    // runner con el resultado del puntuador.
     case "cerrar_dimension": {
+      if (dim.estado === "cerrado") return { ok: true, aviso: `${dim.id} ya estaba cerrado. No se duplicó.` };
+      const malRolCierre = validarRol(estado, args.rol_fuente);
+      if (malRolCierre) return malRolCierre;
+      if (!args.por_que_alcanza?.trim()) {
+        return err("Decí qué se estableció en la conversación que permite decidir este tema.");
+      }
+      dim.pendiente_de_puntaje = { por_que_alcanza: args.por_que_alcanza, rol_fuente: args.rol_fuente };
+      return { ok: true, aviso: `${dim.id} queda cubierto y pasa a puntuarse.` };
+    }
+
+    case "registrar_puntaje": {
       if (dim.estado === "cerrado") return { ok: true, aviso: `${dim.id} ya estaba cerrado. No se duplicó.` };
       const malRol = validarRol(estado, args.rol_fuente);
       if (malRol) return malRol;
