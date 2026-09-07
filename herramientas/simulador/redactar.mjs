@@ -243,8 +243,13 @@ const inventados = [
 const destino = archivo.replace(/informe-?/, "borrador-").replace(/\.json$/, ".md");
 writeFileSync(destino, md.join("\n"));
 
+// La prosa también sale como JSON: la etapa 3 —el render— la necesita separada
+// del markdown, y parsear el borrador para recuperarla sería absurdo.
+const destinoTextos = archivo.replace(/informe-?/, "textos-");
+writeFileSync(destinoTextos, JSON.stringify(texto ?? {}, null, 2));
+
 console.log(`${inf.cliente.empresa} · ${md.join("\n").split(/\s+/).length} palabras`);
 console.log(`Secciones sin redactar: ${md.join("\n").split(falta).length - 1}`);
 console.log(inventados.length ? `⚠ Cifras en la prosa que no están en el informe: ${inventados.join(", ")}` : "Cifras verificadas: ninguna inventada");
 console.log(`Tokens: ${usage?.prompt_tokens ?? 0} entrada, ${usage?.completion_tokens ?? 0} salida · USD ${(((usage?.prompt_tokens ?? 0) * 2 + (usage?.completion_tokens ?? 0) * 10) / 1e6).toFixed(3)}`);
-console.log(`Escrito: ${destino}`);
+console.log(`Escrito: ${destino} y ${destinoTextos}`);
