@@ -1,0 +1,13 @@
+{
+  "name": "marca-r2",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Ladrillos de marca para armar láminas, y el modelo de presentación.",
+  "scripts": {
+    "modelo": "node modelo-presentacion.mjs modelo-r2.pptx"
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}

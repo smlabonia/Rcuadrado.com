@@ -73,6 +73,47 @@ más grande de la primera pantalla.
 - **Radio de esquina**: `--radius: 2px`. Casi recto a propósito. La excepción
   son las tarjetas, a 16px.
 
+## Anatomía de la tarjeta
+
+El manual fijaba el radio —2px general, 16px en tarjetas— y nada más. Lo que
+falta se aprendió maquetando: un rectángulo con relleno plano y borde de 1px se
+ve tosco, y ninguna validación lo detecta.
+
+| Propiedad | Valor |
+|---|---|
+| Radio | 16px. Es la excepción al 2px general |
+| Relleno | Arena sobre fondo papel; papel cuando va sobre arena |
+| Borde | Ninguno sobre papel. Sólo `--line` cuando la tarjeta va sobre arena |
+| Separación del fondo | Sombra apenas perceptible, no borde |
+| Padding interno | 24px |
+| Interior | Etiqueta en mono arriba, contenido debajo |
+
+La sombra reemplaza al borde: separa del fondo sin dibujar una caja. En lámina,
+`blur 10, offset 2, ángulo 90, opacidad 0,16` sobre `#8A7F74`.
+
+## La barra como divisor
+
+La barra de proporción es **el divisor** de la marca. Va bajo el encabezado de
+una lámina de contenido y bajo el título de portadas y separadores. Un
+encabezado no necesita fondo de otro color: se define por la tipografía y por
+esta barra.
+
+**Cada segmento tiene que verse contra su fondo, y con la paleta cruda no pasa.**
+Sobre oscuro el segmento de tinta desaparece contra el fondo; sobre papel
+desaparece el de arena, que es el 60% y el que abre la barra. En los dos casos
+se lee cortada, como si empezara en el segundo segmento. Las sustituciones:
+
+| Fondo | El segmento que falla | Pasa a |
+|---|---|---|
+| Oscuro (`--ink-2`) | Tinta 25% | `--ink-3` |
+| Claro (`--paper`) | Arena 60% | `--line` |
+
+## Fondos oscuros
+
+Las láminas y secciones oscuras van en **`--ink-2`, no en `--ink`**. La tinta
+plena a pantalla completa golpea y no agrega nada; ink-2 es el mismo color un
+punto más arriba y sostiene el mismo peso.
+
 ## Accesibilidad
 
 Parte de la marca, no un agregado:
@@ -86,6 +127,9 @@ Parte de la marca, no un agregado:
 ## Lo que todavía no existe
 
 - Foto real: el sitio no tiene una sola imagen propia.
-- Kit comercial: portada de LinkedIn 1128×191, firma de mail, plantillas de
-  propuesta y de slides.
+- Kit comercial: portada de LinkedIn 1128×191, firma de mail, plantilla de
+  propuesta. La de slides ya existe: `herramientas/marca/`.
+- Las tipografías como archivo de escritorio. En `assets/fonts/` están sólo en
+  woff2, que es formato web. `herramientas/marca/fuentes-escritorio.py` las
+  genera, pero convendría versionar los `.ttf`.
 - Versión del logo para fondos claros y oscuros como archivo distribuible.

@@ -1,0 +1,15 @@
+{
+  "name": "simulador-assessment",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Banco de pruebas descartable del agente entrevistador. No es la plataforma.",
+  "scripts": {
+    "correr": "node correr.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.124.0",
+    "openai": "^7.10.0",
+    "pptxgenjs": "^4.0.1"
+  }
+}
